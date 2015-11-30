@@ -32,7 +32,6 @@ namespace SearchEngine.Model
 
 
 
-
         internal static void startParsing(string filesPath)
         {
             string[] paths = ReadFile.getFilesPaths(filesPath);

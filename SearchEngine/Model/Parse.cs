@@ -9,6 +9,9 @@ namespace SearchEngine.Model
 {
     class Parse
     {
+        /// <summary>
+        /// test
+        /// </summary>
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
 

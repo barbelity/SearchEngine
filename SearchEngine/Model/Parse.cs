@@ -14,16 +14,19 @@ namespace SearchEngine.Model
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
 
-        Regex numReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\s");
-        Regex rangeReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\s");
-        Regex priceReg = new Regex(@"(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\w*\s?");
-        Regex datesRegex = new Regex(@"([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s\d{1,4}(,\s\d{1,4})?", RegexOptions.IgnoreCase);
-        Regex specialExpRegex = new Regex(@"[A-Z]{2,}\s([A-Z]{2,}\s?)*");
-        Regex expRegex = new Regex(@"[a-zA-z]+(-[a-zA-z]+)+\s?");
-        Regex namesRegex = new Regex(@"[A-Z][a-z]{2,}\s([A-Z][a-z]{2,}\s?)+");
-        Regex mailRegex = new Regex(@"\w+\@\w+(\.\w+)+");
-        Regex webRegex = new Regex(@"www\.\w+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?(\/\w+)?");
-        Regex simpleRegex = new Regex(@"[a-zA-Z]+");
+
+        //regexs
+        Regex numReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\s(million|trillion|billion|hundreds))?");
+        Regex rangeReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\-\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?");
+        Regex percentReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\%|\s(percent|percents|percentage))");
+        Regex priceReg = new Regex(@"\s(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(m|bn|\smillion|\sbillion)?");
+        Regex namesReg = new Regex(@"(\s[A-Z][a-z]{1,})+");
+        Regex datesRegex = new Regex(@"(([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s\d{1,4}(,\s\d{1,4})?)|\s\d{4}\s", RegexOptions.IgnoreCase);
+
+        //my regexs
+        Regex quoteRegex = new Regex(@"\s\x22(\s|\w|\d)*\x22"); // for quotes
+        Regex capsRegex = new Regex(@"(\s|\()[A-Z]{2,}(\s[A-Z]{2,})*"); // for initials (like "JS") or headlines ("EMPLOYERS STAY OUT OF CIP DEBATE") 
+
 
         public Parse(string path)
         {

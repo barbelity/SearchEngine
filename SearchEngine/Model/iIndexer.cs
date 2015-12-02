@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace SearchEngine.Model
 {
-    class Indexer : iIndexer
+    interface iIndexer
     {
-
     }
 }

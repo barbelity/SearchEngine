@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace SearchEngine.Model
 {
-    class Indexer : iIndexer
+    interface iParse
     {
+        Dictionary<string, Positions> parseDoc(string doc);
+        bool startParseing(string path);
 
     }
 }

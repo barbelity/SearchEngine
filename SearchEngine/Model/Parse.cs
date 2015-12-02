@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace SearchEngine.Model
 {
-    class Parse
+    class Parse : iParse
     {
-        /// <summary>
-        /// test
-        /// </summary>
+
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
 
@@ -29,7 +27,7 @@ namespace SearchEngine.Model
                 Doc doc = new Doc(docString);
 
             }
-            WaitHandle.WaitAll(doneEvents);
+            //WaitHandle.WaitAll(doneEvents);
             Console.WriteLine("All calculations are complete.");
         }
 
@@ -42,7 +40,7 @@ namespace SearchEngine.Model
                 string[] docs = ReadFile.fileToDocString(filePath);
                 foreach (var doc in docs)
                 {
-                    ThreadPool.QueueUserWorkItem(parseDoc, doc);
+                    //   ThreadPool.QueueUserWorkItem(parseDoc, doc);
                 }
             }
         }
@@ -73,7 +71,7 @@ namespace SearchEngine.Model
                 }
                 mStopwords.ReleaseMutex();
 
-                if (isNumber(term))
+                // if (isNumber(term))
                 {
 
                 }
@@ -106,7 +104,17 @@ namespace SearchEngine.Model
                 throw e;
             }
         }
-        //testing github
 
+
+
+        public Dictionary<string, Positions> parseDoc(string doc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool startParseing(string path)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace SearchEngine.Model
             Console.WriteLine("All calculations are complete.");
         }
 
-//asdjansdkjahsdkjah
+        //asdjansdkjahsdkjah
 
         internal static void startParsing(string filesPath)
         {
@@ -105,7 +105,7 @@ namespace SearchEngine.Model
                 throw e;
             }
         }
-//testing github
+        //testing github
 
     }
 }

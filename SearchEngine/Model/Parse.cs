@@ -134,23 +134,23 @@ namespace SearchEngine.Model
         private string fixDate(string termString)
         {
             string dd, mm, yyyy;
-            MatchCollection matchs = justMonthReg.Matches(termString);
+            MatchCollection matches = justMonthReg.Matches(termString);
 
-            if (matchs.Count != 0)
+            if (matches.Count != 0)
             {
-                mm = months[matchs[0].ToString()];
-                matchs = numReg.Matches(termString);
+                mm = months[matches[0].ToString().ToLower()];
+                matches = numReg.Matches(termString);
 
-                dd = matchs[0].ToString();
+                dd = matches[0].ToString();
                 if (dd.Length < 2) dd = "0" + dd;
 
-                if (matchs.Count < 2)
+                if (matches.Count < 2)
                 {
                     yyyy = "xxxx";
                 }
                 else
                 {
-                    yyyy = matchs[1].ToString();
+                    yyyy = matches[1].ToString();
                     if (yyyy.Length == 2)
                     {
                         yyyy = "19" + yyyy;

@@ -72,5 +72,32 @@ namespace SearchEngine.Model
             string file = new System.IO.StreamReader(filePath).ReadToEnd();
             return file.Split(new string[] { "<DOC>" }, StringSplitOptions.None);
         }
+
+        /// <summary>
+        ///  reads stop wards
+        /// </summary>
+        /// <param name="path">path to stop words text file</param>
+        internal static Dictionary<string, bool> readStopWords(string path)
+        {
+            Dictionary<string, bool> StopWords = new Dictionary<string, bool>();
+
+            try
+            {
+                string text = System.IO.File.ReadAllText(path);
+                string[] words = text.Split('\n');
+                foreach (string word in words)
+                {
+                    StopWords[word.Substring(0, word.Length - 1)] = true;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return StopWords;
+
+        }
+
     }
 }

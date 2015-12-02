@@ -8,7 +8,7 @@ namespace SearchEngine.Model
 {
     interface iParse
     {
-        Dictionary<string, Positions> parseDoc(string doc);
+        Dictionary<Term, Positions> parseDoc(string doc);
         bool startParseing(string path);
 
     }

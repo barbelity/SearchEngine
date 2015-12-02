@@ -14,12 +14,13 @@ namespace SearchEngine.Model
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
 
-        Regex numRegex = new Regex(@"\s\d+((,\d{3})*)*(\.\d+)?(\s\d+\/\d+)?\s");
-        Regex priceRegex = new Regex(@"[A-Z]*(Dollars|Pounds)\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\w*\s?");
+        Regex numReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\s");
+        Regex rangeReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\s");
+        Regex priceReg = new Regex(@"(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\w*\s?");
+        Regex datesRegex = new Regex(@"([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s\d{1,4}(,\s\d{1,4})?", RegexOptions.IgnoreCase);
         Regex specialExpRegex = new Regex(@"[A-Z]{2,}\s([A-Z]{2,}\s?)*");
         Regex expRegex = new Regex(@"[a-zA-z]+(-[a-zA-z]+)+\s?");
         Regex namesRegex = new Regex(@"[A-Z][a-z]{2,}\s([A-Z][a-z]{2,}\s?)+");
-        Regex datesRegex = new Regex(@"([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s\d{1,4}(,\s\d{1,4})?", RegexOptions.IgnoreCase);
         Regex mailRegex = new Regex(@"\w+\@\w+(\.\w+)+");
         Regex webRegex = new Regex(@"www\.\w+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?(\/\w+)?");
         Regex simpleRegex = new Regex(@"[a-zA-Z]+");
@@ -118,7 +119,7 @@ namespace SearchEngine.Model
 
 
 
-        public Dictionary<string, Positions> parseDoc(string doc)
+        public Dictionary<Term, Positions> parseDoc(string doc)
         {
             throw new NotImplementedException();
         }

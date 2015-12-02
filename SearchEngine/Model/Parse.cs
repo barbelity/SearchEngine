@@ -10,28 +10,33 @@ namespace SearchEngine.Model
 {
     class Parse : iParse
     {
-
+        Dictionary<string, string> months = new Dictionary<string, string>();
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
+
 
         private char[] charsToTrim = { ',', '.', ' ', ';', ':', '~', '|', '\n' };
 
         //regexs
-        Regex numReg = new Regex(@"(\s|\()\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\s(million|trillion|billion|hundreds))?");
-        Regex rangeReg = new Regex(@"(\s|\()\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\-\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?");
-        Regex percentReg = new Regex(@"(\s|\()\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\%|\s(percent|percents|percentage))");
-        Regex priceReg = new Regex(@"(\s|\()(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(m|bn|\smillion|\sbillion)?");
-        Regex namesReg = new Regex(@"((\s|\()[A-Z][a-z]{1,})+");
+        Regex numReg = new Regex(@"\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\s(million|trillion|billion|hundreds))?");
+        Regex rangeReg = new Regex(@"\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\-\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?");
+        Regex percentReg = new Regex(@"\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\%|\s(percent|percents|percentage))");
+        Regex priceReg = new Regex(@"(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(m|bn|\smillion|\sbillion)?");
+        Regex namesReg = new Regex(@"([A-Z][a-z]{1,})+");
         Regex datesRegex = new Regex(@"(([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s\d{1,4}(,\s\d{1,4})?)|\s\d{4}\s", RegexOptions.IgnoreCase);
 
         //my regexs
-        Regex quoteRegex = new Regex(@"(\s|\()\x22(\s|\w|\d)*\x22"); // for quotes
-        Regex capsRegex = new Regex(@"(\s|\()[A-Z]{2,}(\s[A-Z]{2,})*"); // for initials (like "JS") or headlines ("EMPLOYERS STAY OUT OF CIP DEBATE") 
+        Regex quoteRegex = new Regex(@"\x22(\s|\w|\d)*\x22"); // for quotes
+        Regex capsRegex = new Regex(@"[A-Z]{2,}(\s[A-Z]{2,})*"); // for initials (like "JS") or headlines ("EMPLOYERS STAY OUT OF CIP DEBATE") 
+
+        //for date fix
+        Regex justMonthReg = new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)", RegexOptions.IgnoreCase);
 
 
         public Parse(string path)
         {
             StopWords = ReadFile.readStopWords(path + @"\StopWords.txt");
+            addMonths();
         }
 
 
@@ -76,6 +81,7 @@ namespace SearchEngine.Model
             //get terms from text
             Dictionary<Term, Positions> terms = new Dictionary<Term, Positions>();
             int numOfTerms = getTerms(ref text, ref terms, datesRegex, "Date", name);
+            return terms;
 
         }
 
@@ -127,7 +133,39 @@ namespace SearchEngine.Model
 
         private string fixDate(string termString)
         {
-            new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)", RegexOptions.IgnoreCase)
+            string dd, mm, yyyy;
+            MatchCollection matchs = justMonthReg.Matches(termString);
+
+            if (matchs.Count != 0)
+            {
+                mm = months[matchs[0].ToString()];
+                matchs = numReg.Matches(termString);
+
+                dd = matchs[0].ToString();
+                if (dd.Length < 2) dd = "0" + dd;
+
+                if (matchs.Count < 2)
+                {
+                    yyyy = "xxxx";
+                }
+                else
+                {
+                    yyyy = matchs[1].ToString();
+                    if (yyyy.Length == 2)
+                    {
+                        yyyy = "19" + yyyy;
+                    }
+                }
+            }
+            else
+            {
+                mm = "xx";
+                dd = "xx";
+                yyyy = termString;
+
+            }
+
+            return dd + "/" + mm + "/" + yyyy;
         }
 
         public bool startParseing(string path)
@@ -135,33 +173,33 @@ namespace SearchEngine.Model
             throw new NotImplementedException();
         }
 
-        List<string> addMonths(List<string> month)
+        private void addMonths()
         {
-            month.Add("january");
-            month.Add("february");
-            month.Add("march");
-            month.Add("april");
-            month.Add("may");
-            month.Add("june");
-            month.Add("july");
-            month.Add("august");
-            month.Add("september");
-            month.Add("october");
-            month.Add("november");
-            month.Add("december");
-            month.Add("jan");
-            month.Add("feb");
-            month.Add("mar");
-            month.Add("apr");
-            month.Add("may");
-            month.Add("jun");
-            month.Add("jul");
-            month.Add("aug");
-            month.Add("sep");
-            month.Add("oct");
-            month.Add("nov");
-            month.Add("dec");
-            return month;
+            months.Add("january", "01");
+            months.Add("february", "02");
+            months.Add("march", "03");
+            months.Add("april", "04");
+            months.Add("may", "05");
+            months.Add("june", "06");
+            months.Add("july", "07");
+            months.Add("august", "08");
+            months.Add("september", "09");
+            months.Add("october", "10");
+            months.Add("november", "11");
+            months.Add("december", "12");
+            months.Add("jan", "01");
+            months.Add("feb", "02");
+            months.Add("mar", "03");
+            months.Add("apr", "04");
+            months.Add("may", "05");
+            months.Add("jun", "06");
+            months.Add("jul", "07");
+            months.Add("aug", "08");
+            months.Add("sep", "09");
+            months.Add("oct", "10");
+            months.Add("nov", "11");
+            months.Add("dec", "12");
+
         }
 
     }

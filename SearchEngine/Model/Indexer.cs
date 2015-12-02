@@ -18,5 +18,10 @@ namespace SearchEngine.Model
         {
             throw new NotImplementedException();
         }
+
+        public void saveTerms(Dictionary<Term, Positions> terms)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

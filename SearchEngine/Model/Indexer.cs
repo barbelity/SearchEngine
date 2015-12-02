@@ -9,5 +9,14 @@ namespace SearchEngine.Model
     class Indexer : iIndexer
     {
 
+        public void saveTerms(Dictionary<string, Positions> terms)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void startIndexing()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

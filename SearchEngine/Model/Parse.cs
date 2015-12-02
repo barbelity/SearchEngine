@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +13,16 @@ namespace SearchEngine.Model
 
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
+
+        Regex numRegex = new Regex(@"\s\d+((,\d{3})*)*(\.\d+)?(\s\d+\/\d+)?\s");
+        Regex priceRegex = new Regex(@"[A-Z]*(Dollars|Pounds)\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?\w*\s?");
+        Regex specialExpRegex = new Regex(@"[A-Z]{2,}\s([A-Z]{2,}\s?)*");
+        Regex expRegex = new Regex(@"[a-zA-z]+(-[a-zA-z]+)+\s?");
+        Regex namesRegex = new Regex(@"[A-Z][a-z]{2,}\s([A-Z][a-z]{2,}\s?)+");
+        Regex datesRegex = new Regex(@"([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s\d{1,4}(,\s\d{1,4})?", RegexOptions.IgnoreCase);
+        Regex mailRegex = new Regex(@"\w+\@\w+(\.\w+)+");
+        Regex webRegex = new Regex(@"www\.\w+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?(\/\w+)?");
+        Regex simpleRegex = new Regex(@"[a-zA-Z]+");
 
         public Parse(string path)
         {

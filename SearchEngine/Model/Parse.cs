@@ -9,9 +9,7 @@ namespace SearchEngine.Model
 {
     class Parse
     {
-        /// <summary>
-        /// test
-        /// </summary>
+
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
 
@@ -33,7 +31,7 @@ namespace SearchEngine.Model
             Console.WriteLine("All calculations are complete.");
         }
 
-
+//asdjansdkjahsdkjah
 
         internal static void startParsing(string filesPath)
         {

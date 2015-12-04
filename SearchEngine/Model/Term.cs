@@ -8,8 +8,8 @@ namespace SearchEngine.Model
     class Term
     {
         string type;
-        string value;
-        private string termString;
+        string termString;
+
 
         public Term(string type, string termString)
         {
@@ -20,12 +20,12 @@ namespace SearchEngine.Model
 
         public override int GetHashCode()
         {
-            return value.GetHashCode();
+            return termString.GetHashCode();
         }
 
         public override string ToString()
         {
-            return value;
+            return termString;
         }
     }
 }

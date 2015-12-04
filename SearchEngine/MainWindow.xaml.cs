@@ -23,8 +23,13 @@ namespace SearchEngine
     {
         public MainWindow()
         {
-            string path = "";
-            Parse.startParsing(path);
+
+
+
+
+            string path = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus";
+            Parse parser = new Parse(path);
+            parser.startParsing();
 
         }
     }

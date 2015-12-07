@@ -15,13 +15,13 @@ namespace SearchEngine.Model
 			set { docsToFile = value;}
 		}
 
-		private Dictionary<string, Positions> tempIndex;
+		private Dictionary<string, Term> tempIndex;
 		private int docsCounter = 0;
 
 		public Indexer()
 		{
 			this.docsToFile = 10;
-			tempIndex = new Dictionary<string, Positions>();
+			tempIndex = new Dictionary<string, Term>();
 		}
 
         public void saveTerms(Dictionary<string, Term> terms)
@@ -46,7 +46,7 @@ namespace SearchEngine.Model
 			}
 			else
 			{
-				foreach (KeyValuePair<string, Positions> t in terms)
+				foreach (KeyValuePair<string, Term> t in terms)
 				{
 
 				}
@@ -55,11 +55,6 @@ namespace SearchEngine.Model
 
 
             throw new NotImplementedException();
-            //add the terms received to a temp dictionary
-            //calculate doc's info
-            //save doc info to docs dictionary on memory
-            //after X time, write all data to posting file
-            //keep dictionary on memory for indexing
         }
 
 		private void writeTermsToFile()

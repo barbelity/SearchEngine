@@ -7,13 +7,14 @@ namespace SearchEngine.Model
 {
     class Term
     {
-        string type;
-        string termString;
-
+        public string type { get; set; }
+        public string termString { get; set; }
+        // <docName,positions> example positions="4,7,8,"
+        public Dictionary<string, string> d_locations { get; set; }
 
         public Term(string type, string termString)
         {
-            // TODO: Complete member initialization
+            d_locations = new Dictionary<string, string>();
             this.type = type;
             this.termString = termString;
         }
@@ -23,9 +24,27 @@ namespace SearchEngine.Model
             return termString.GetHashCode();
         }
 
+        internal void addPosition(string docNme, int p)
+        {
+            if (!d_locations.ContainsKey(docNme))
+            {
+                d_locations[docNme] = p + ",";
+            }
+            else
+            {
+                d_locations[docNme] += p + ",";
+            }
+
+        }
         public override string ToString()
         {
-            return termString;
+            string ans = "";
+            //ans = termString + "=|";
+            foreach (var pair in d_locations)
+            {
+                ans += pair.Key + ":" + pair.Value + "|";
+            }
+            return ans;
         }
     }
 }

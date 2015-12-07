@@ -12,6 +12,11 @@ namespace SearchEngine.Model
         public void saveTerms(Dictionary<string, Positions> terms)
         {
             throw new NotImplementedException();
+			//add the terms received to a temp dictionary
+			//calculate doc's info
+			//save doc info to docs dictionary on memory
+			//after X time, write all data to posting file
+			//keep dictionary on memory for indexing
         }
 
         public void startIndexing()

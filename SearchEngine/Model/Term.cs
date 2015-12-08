@@ -46,5 +46,10 @@ namespace SearchEngine.Model
             }
             return ans;
         }
+
+        public int returnTF(string docName)
+        {
+            return d_locations[docName].Count(x => x == ',');
+        }
     }
 }

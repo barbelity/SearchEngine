@@ -8,36 +8,34 @@ namespace SearchEngine.Model
 {
     class Doc
     {
-        private ManualResetEvent _doneEvent;
-        private string rawData;
-        private int docIndex;
+        private string docName1;
 
-        public Doc(string content)
-        {
-            rawData = content;
-            _doneEvent = new ManualResetEvent(false);
-        }
+        public string maxtfString { get; set; }
+        public int maxtfCount { get; set; }
 
-        public void ThreadPoolCallback(Object threadContext)
-        {
-            docIndex = (int)threadContext;
-            Console.WriteLine("Parsing doc {0} started...", docIndex);
-            parsDoc(rawData);
-            Console.WriteLine("Parsing doc {0} ended...", docIndex);
-            _doneEvent.Set();
-        }
 
-        private void parsDoc(string rawData)
+        public string docName { get; set; }
+        public string date { get; set; }
+
+
+        public Doc(string docName, string date)
         {
 
-            string[] split = rawData.Split(new string[] { "<DOCNO>" }, StringSplitOptions.None);
-            split = split[1].Split(new string[] { "</DOCNO>" }, StringSplitOptions.None);
-            string nDoc = split[0];
-            //Doc text
-            split = split[1].Split(new string[] { "<TEXT>" }, StringSplitOptions.None);
-            split = split[1].Split(new string[] { "</TEXT>" }, StringSplitOptions.None);
-            string text = split[0];
+            this.docName = docName;
+            this.date = date;
+            maxtfString = "";
+            maxtfCount = 0;
         }
+
+        public Doc(string docName)
+        {
+
+            this.docName = docName;
+            this.date = "NA";
+            maxtfString = "";
+            maxtfCount = 0;
+        }
+
     }
 
 

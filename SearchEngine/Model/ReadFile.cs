@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace SearchEngine.Model
 {
@@ -69,6 +70,17 @@ namespace SearchEngine.Model
 
         internal static string[] fileToDocString(string filePath)
         {
+            /*
+            XmlDocument file = new XmlDocument();
+            XmlNodeList docs = file.GetElementsByTagName("DOC");
+            foreach (XmlNode doc in docs)
+            {
+                RetrievalEngineProject.MainWindow.docCounter++;
+                Doc newDoc = new Doc(elem);
+
+            }
+            doc.Load(filePath);
+            */
             string file = new System.IO.StreamReader(filePath).ReadToEnd();
             return file.Split(new string[] { "<DOC>" }, StringSplitOptions.None);
         }

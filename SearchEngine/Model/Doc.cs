@@ -8,7 +8,7 @@ namespace SearchEngine.Model
 {
     class Doc
     {
-        private string docName1;
+
 
         public string maxtfString { get; set; }
         public int maxtfCount { get; set; }

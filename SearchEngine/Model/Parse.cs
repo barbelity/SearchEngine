@@ -15,16 +15,17 @@ namespace SearchEngine.Model
         private Dictionary<string, bool> StopWords;
         Mutex mStopwords = new Mutex();
         string filesPath;
-
+        StemmerInterface stemmer = new Stemmer();
 
         private char[] charsToTrim = { ',', '.', ' ', ';', ':', '~', '|', '\n' };
-
+        #region Regex's
         //regexs
         Regex numReg = new Regex(@"\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\s(million|trillion|billion|hundreds))?");
         Regex rangeReg = new Regex(@"\s(between\s)?\d+(\-|\sand\s)\d+", RegexOptions.IgnoreCase);
         Regex percentReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\%|\s(percent|percents|percentage))");
         Regex priceReg = new Regex(@"\s(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(m|bn|\smillion|\sbillion)?");
-        Regex namesReg = new Regex(@"\s([A-Z][a-z]{1,})+");
+        Regex namesReg = new Regex(@"\s([A-Z][a-z]{1,}\s)+");
+        Regex wordRegex = new Regex(@"[a-zA-Z]+");
 
         //Regex datesRegex = new Regex(@"([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)(\s\d{1,4})?(,\s\d{1,4})?)|\s\d{4})\s", RegexOptions.IgnoreCase);
         //Regex datesRegex = new Regex(@"(\D([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)(\s\d{1,4})?(,\s\d{4})?)", RegexOptions.IgnoreCase);
@@ -40,7 +41,12 @@ namespace SearchEngine.Model
         Regex justMonthReg = new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)", RegexOptions.IgnoreCase);
 
         Regex justANumberReg = new Regex(@"\d+");
+
+        #endregion
+
         Dictionary<string, Term> d_allTerms = new Dictionary<string, Term>();
+        Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
+        bool use_stem = false;
 
         public Parse(string path)
         {
@@ -77,10 +83,10 @@ namespace SearchEngine.Model
 
 
 
-        public void parseDoc(string doc)
+        public void parseDoc(string docRaw)
         {
             //get name
-            string[] split = doc.Split(new string[] { "<DOCNO>" }, StringSplitOptions.None);
+            string[] split = docRaw.Split(new string[] { "<DOCNO>" }, StringSplitOptions.None);
             split = split[1].Split(new string[] { "</DOCNO>" }, StringSplitOptions.None);
             string name = split[0].Trim(charsToTrim);
             //get text

@@ -44,41 +44,48 @@ namespace SearchEngine.Model
 
         #endregion
 
-        Dictionary<string, Term> d_allTerms = new Dictionary<string, Term>();
+        public SortedDictionary<string, Term> d_allTerms = new SortedDictionary<string, Term>();
         Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
         bool use_stem = false;
 
         public Parse(string path)
         {
             filesPath = path;
-            StopWords = ReadFile.readStopWords(path + @"\stopWords\stop_words.txt");
+			StopWords = ReadFile.readStopWords(@"C:\Users\Bar\Desktop\engineFiles\stopWords\stopwords.txt");
 
             addMonths();
         }
 
 
 
-        internal void startParsing()
+        public void startParsing()
         {
-            string[] paths = ReadFile.getFilesPaths(filesPath);
-
+			Indexer indexer = new Indexer();
+			int docsCount = 0;
+			string[] paths = ReadFile.getFilesPaths(filesPath);
             foreach (string filePath in paths)
             {
-
                 string[] docs = ReadFile.fileToDocString(filePath);
                 foreach (string doc in docs)
                 {
                     if (doc.Length > 3)
                     {
-
                         parseDoc(doc);
-                        int j = 1;
+						docsCount++;
+						if (docsCount == 1)
+						{
+							indexer.saveTerms(d_allTerms);
+							d_allTerms = new SortedDictionary<string, Term>();
+							docsCount = 0;
+						}
+                        //int j = 1;
                     }
-
                 }
-
             }
-            int i = 1;
+			indexer.saveTerms(d_allTerms);
+			d_allTerms = new SortedDictionary<string, Term>();
+			docsCount = 0;
+            //int i = 1;
         }
 
 
@@ -112,7 +119,7 @@ namespace SearchEngine.Model
             string text = split[0];
             //get terms from text
             //Dictionary<string, Term> d_terms = new Dictionary<string, Term>();
-            string t = "The 1999 23-25 23 January-23 a b 44% Ziv Kaspersky edition of the skypee 10.6 percent : Dollars 20.6m Dollars 5.3bn fgdf dfgdf  $100 million : Dollars 900,000 , Dollars 1.7320d January 23, 1999. feb 23, oct 1988, 1 oct 1988 between 18 and 24";
+            //string t = "The 1999 23-25 23 January-23 a b 44% Ziv Kaspersky edition of the skypee 10.6 percent : Dollars 20.6m Dollars 5.3bn fgdf dfgdf  $100 million : Dollars 900,000 , Dollars 1.7320d January 23, 1999. feb 23, oct 1988, 1 oct 1988 between 18 and 24";
             int numOfTerms = getTerms(ref text, datesInOrderRegex, "Date", docName);
             numOfTerms += getTerms(ref text, datesMonthFirstRegex, "Date", docName);
             numOfTerms += getTerms(ref text, yearsRegex, "Year", docName);

@@ -1,6 +1,7 @@
 ﻿using SearchEngine.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,13 +25,22 @@ namespace SearchEngine
         public MainWindow()
         {
 
-
-
-
-            string path = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus";
-            Parse parser = new Parse(path);
+			System.Console.WriteLine("started parsing at:" + DateTime.Now);
+			File.Create("postingFile.txt");
+			string path = @"C:\Users\Bar\Desktop\engineFiles\corpus";
+			//Indexer indexer = new Indexer();
+			Parse parser = new Parse(path);
             parser.startParsing();
-
+			SortedDictionary<string, Term> dict = parser.d_allTerms;
+			//System.Console.WriteLine("Finished parsing at:" + DateTime.Now);
+			System.Console.WriteLine("finished all at:" + DateTime.Now);
+			System.Console.Read();
+			/*
+			System.Console.WriteLine("started indexing at:" + DateTime.Now);
+			indexer.saveTerms(dict);
+			System.Console.WriteLine("finished indexing at:" + DateTime.Now);
+			System.Console.Read();
+			*/
         }
     }
 }

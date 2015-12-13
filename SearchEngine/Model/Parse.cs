@@ -72,7 +72,7 @@ namespace SearchEngine.Model
                     {
                         parseDoc(doc);
 						docsCount++;
-						if (docsCount == 1)
+						if (docsCount == 2000)
 						{
 							indexer.saveTerms(d_allTerms);
 							d_allTerms = new SortedDictionary<string, Term>();

@@ -10,13 +10,13 @@ namespace SearchEngine.Model
 {
     class ReadFile
     {
+
         static public Queue<string> ReadFiles(string path)
         {
             Queue<string> data = new Queue<string> { };
             try
             {
                 string[] filesPaths = Directory.GetFiles(@path.ToString(), "*.", SearchOption.TopDirectoryOnly);
-
                 foreach (string filePath in filesPaths)
                 {
                     try
@@ -26,32 +26,22 @@ namespace SearchEngine.Model
                         foreach (string doc in docs)
                         {
                             if (doc.Length > 0)
-                            {
-
                                 data.Enqueue(doc.Split(new string[] { "</DOC>" }, StringSplitOptions.None)[0]);
-
-                            }
                         }
                     }
                     catch (Exception e)
                     {
-
                         throw e;
                     }
-
-
                 }
-
             }
             catch (Exception e)
             {
-
                 throw e;
             }
-
-
             return data;
         }
+
 
         internal static string[] getFilesPaths(string filesPath)
         {
@@ -61,7 +51,6 @@ namespace SearchEngine.Model
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -77,13 +66,13 @@ namespace SearchEngine.Model
             {
                 RetrievalEngineProject.MainWindow.docCounter++;
                 Doc newDoc = new Doc(elem);
-
             }
             doc.Load(filePath);
             */
             string file = new System.IO.StreamReader(filePath).ReadToEnd();
             return file.Split(new string[] { "<DOC>" }, StringSplitOptions.None);
         }
+
 
         /// <summary>
         ///  reads stop wards
@@ -92,7 +81,6 @@ namespace SearchEngine.Model
         internal static Dictionary<string, bool> readStopWords(string path)
         {
             Dictionary<string, bool> StopWords = new Dictionary<string, bool>();
-
             try
             {
                 string text = System.IO.File.ReadAllText(path);
@@ -106,10 +94,9 @@ namespace SearchEngine.Model
             {
                 throw e;
             }
-			
             return StopWords;
-
         }
+
 
     }
 }

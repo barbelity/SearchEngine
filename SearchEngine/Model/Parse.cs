@@ -13,9 +13,12 @@ namespace SearchEngine.Model
     {
         Dictionary<string, string> months = new Dictionary<string, string>();
         private Dictionary<string, bool> StopWords;
-        Mutex mStopwords = new Mutex();
-        string filesPath;
+        //Mutex mStopwords = new Mutex();
+        private string filesPath;
         StemmerInterface stemmer = new Stemmer();
+		public SortedDictionary<string, Term> d_allTerms = new SortedDictionary<string, Term>();
+		public Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
+		bool use_stem = false;
 
         private char[] charsToTrim = { ',', '.', ' ', ';', ':', '~', '|', '\n' };
         #region Regex's
@@ -44,18 +47,13 @@ namespace SearchEngine.Model
 
         #endregion
 
-        public SortedDictionary<string, Term> d_allTerms = new SortedDictionary<string, Term>();
-        Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
-        bool use_stem = false;
 
         public Parse(string path)
         {
             filesPath = path;
 			StopWords = ReadFile.readStopWords(@"C:\Users\Bar\Desktop\engineFiles\stopWords\stopwords.txt");
-
             addMonths();
         }
-
 
 
         public void startParsing()
@@ -82,12 +80,12 @@ namespace SearchEngine.Model
                     }
                 }
             }
+			//saving the remainder of terms
 			indexer.saveTerms(d_allTerms);
 			d_allTerms = new SortedDictionary<string, Term>();
 			docsCount = 0;
             //int i = 1;
         }
-
 
 
         public void parseDoc(string docRaw)
@@ -97,12 +95,8 @@ namespace SearchEngine.Model
             split = split[1].Split(new string[] { "</DOCNO>" }, StringSplitOptions.None);
             string docName = split[0].Trim(charsToTrim);
 
-
-
             //get text + date
             split = split[1].Split(new string[] { "<TEXT>" }, StringSplitOptions.None);
-            /*
-
             int dateStartIdx = split[0].IndexOf("<DATE1>");
             if (dateStartIdx > 0)
             {
@@ -110,17 +104,14 @@ namespace SearchEngine.Model
                 d_docs[docName] = new Doc(docName, date.Trim(charsToTrim));
             }
             else
-            {
                 d_docs[docName] = new Doc(docName);
-            }
-            */
 
             split = split[1].Split(new string[] { "</TEXT>" }, StringSplitOptions.None);
             string text = split[0];
-            //get terms from text
-            //Dictionary<string, Term> d_terms = new Dictionary<string, Term>();
-            //string t = "The 1999 23-25 23 January-23 a b 44% Ziv Kaspersky edition of the skypee 10.6 percent : Dollars 20.6m Dollars 5.3bn fgdf dfgdf  $100 million : Dollars 900,000 , Dollars 1.7320d January 23, 1999. feb 23, oct 1988, 1 oct 1988 between 18 and 24";
-            int numOfTerms = getTerms(ref text, datesInOrderRegex, "Date", docName);
+            
+			//get terms from text
+            int numOfTerms = 0;//stores the number of terms in doc
+			numOfTerms += getTerms(ref text, datesInOrderRegex, "Date", docName);
             numOfTerms += getTerms(ref text, datesMonthFirstRegex, "Date", docName);
             numOfTerms += getTerms(ref text, yearsRegex, "Year", docName);
             numOfTerms += getTerms(ref text, rangeReg, "Range", docName);
@@ -129,10 +120,11 @@ namespace SearchEngine.Model
             numOfTerms += getTerms(ref text, numReg, "Number", docName);
             numOfTerms += getTerms(ref text, namesReg, "Name", docName);
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
-            //return d_terms;
-
+            //update numOfTerms - if we put it in constructor of doc it saves time
+			d_docs[docName].termsCount = numOfTerms;
         }
-
+			//Dictionary<string, Term> d_terms = new Dictionary<string, Term>();
+            //string t = "The 1999 23-25 23 January-23 a b 44% Ziv Kaspersky edition of the skypee 10.6 percent : Dollars 20.6m Dollars 5.3bn fgdf dfgdf  $100 million : Dollars 900,000 , Dollars 1.7320d January 23, 1999. feb 23, oct 1988, 1 oct 1988 between 18 and 24";
 
         private void addTermToDic(string term, string docName, int index, ref int numOfTerms, string type)
         {
@@ -140,7 +132,6 @@ namespace SearchEngine.Model
             {
                 d_allTerms[term] = new Term(type, term);
                 numOfTerms++;
-
             }
             d_allTerms[term].addPosition(docName, index);
             /*
@@ -167,9 +158,6 @@ namespace SearchEngine.Model
                 if (StopWords.ContainsKey(termString) || termString.Length <= 2)
                     continue;
 
-
-
-
                 if (type == "Price" || type == "Range" || type == "Percent" || type == "Price" || type == "Date" || type == "Year" || type == "Name")
                 {
                     string clearTerm = new String('#', term.Length - 2);
@@ -179,7 +167,6 @@ namespace SearchEngine.Model
                 if (type == "Range")
                 {
                     MatchCollection numbers = justANumberReg.Matches(termString);
-
                     int a, b;
                     int.TryParse(numbers[1].ToString(), out b);
                     int.TryParse(numbers[0].ToString(), out a);
@@ -195,19 +182,18 @@ namespace SearchEngine.Model
                         addTermToDic(a.ToString(), docName, term.Index, ref numOfTerms, "Number");
                         addTermToDic(b.ToString(), docName, term.Index, ref numOfTerms, "Number");
                     }
-
                 }
+
                 else if (type == "Percent")
                 {
                     string[] percentSplit = termString.Split(' ', '%');
                     float percent;
                     float.TryParse(percentSplit[0], out percent);
                     addTermToDic((percent * 0.01).ToString("P"), docName, term.Index, ref numOfTerms, "Percent");
-
                 }
+
                 else if (type == "Price")
                 {
-
                     MatchCollection number = numReg.Matches(termString);
                     float price;
                     float.TryParse(number[0].ToString(), out price);
@@ -219,10 +205,9 @@ namespace SearchEngine.Model
                     {
                         price = price * 1000000000;
                     }
-
                     addTermToDic(price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
-
                 }
+
                 else if (type == "Date")
                 {
                     try
@@ -233,7 +218,6 @@ namespace SearchEngine.Model
                         {
                             termString = termString.Remove(thIndex, 2);
                         }
-
                         DateTime convertedDate = Convert.ToDateTime(termString);
                         termString = convertedDate.ToShortDateString();
                         addTermToDic(termString, docName, term.Index, ref numOfTerms, "Date");
@@ -246,7 +230,6 @@ namespace SearchEngine.Model
                         if (months.ContainsKey(termStringSplited[1]))
                         {
                             dd = termStringSplited[0];
-
                             mm = months[termStringSplited[1]];
                             if (termStringSplited.Length == 3)
                             {
@@ -277,21 +260,19 @@ namespace SearchEngine.Model
                                     yyyy = termStringSplited[1];
                                     dd = "01";
                                 }
-
                             }
                         }
-
-
                         addTermToDic(dd + "/" + mm + "/" + yyyy, docName, term.Index, ref numOfTerms, "Date");
-
                     }
                 }
+
                 else if (type == "Year")
                 {
                     DateTime convertedDate = new DateTime(int.Parse(termString), 1, 1);
                     termString = convertedDate.ToShortDateString();
                     addTermToDic(termString, docName, term.Index, ref numOfTerms, "Date");
                 }
+
                 else // everything else
                 {
                     //stemmer
@@ -299,13 +280,10 @@ namespace SearchEngine.Model
                         termString = stemmer.stemTerm(termString);
                     addTermToDic(termString, docName, term.Index, ref numOfTerms, type);
                 }
-
             }
+
             return numOfTerms;
         }
-
-
-
 
         private void addMonths()
         {

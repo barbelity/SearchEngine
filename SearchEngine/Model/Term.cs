@@ -42,7 +42,7 @@ namespace SearchEngine.Model
             //ans = termString + "=|";
             foreach (var pair in d_locations)
             {
-                ans += pair.Key + ":" + pair.Value + "|";
+                ans += pair.Key + ";" + pair.Value.Count(x => x == ',') + ":" + pair.Value + "|";
             }
             return ans;
         }

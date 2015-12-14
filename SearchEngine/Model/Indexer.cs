@@ -12,28 +12,31 @@ namespace SearchEngine.Model
 
 		//private SortedDictionary<string, int> mainIndex;
 		private SortedList<string, int> mainIndexList;
-		private string lastInPosting;
-		private bool writeToEnd;//this boolean determines wether to write to end of file
+//		private string lastInPosting;//keep the last term in file for quick writing
+//		private bool writeToEnd;//this boolean determines wether to write to end of file
 		StreamReader postingReader;
 		StreamWriter tempWriter;
 
 		public Indexer()
 		{
 			//mainIndex = new SortedDictionary<string, int>();
-			mainIndexList = new SortedList<string, int>(); //- OPTIONAL to use SortedList instead of SortedDictionary for access by index
-			lastInPosting = null;
+			mainIndexList = new SortedList<string, int>(); //- OPTIONAL to use SortedList instead of SortedDictionary for access by index, int = df
+//			lastInPosting = null;
 		}
 
-        public void saveTerms(SortedDictionary<string, Term> terms)
+        public void saveTerms(SortedDictionary<string, Term> terms, Dictionary<string, Doc> docs)
         {
 			int lineCount = 0;//on what line in posting i stand
 			int writeLineNumber;//the line number i need to write
 			int insertedTerms = 0;//we must keep trace on how many new terms added
 			string currTerm;
 			string currLine = "";
+
+			//statistics
+			string currDoc = "";
+			int currDf;
 			//lastInPosting = null;
-			writeToEnd = false;
-			//CREATE here 1 writer to append posting, 1 reader for posting, 1 writer for new TEMP file
+//			writeToEnd = false;
 			postingReader = new StreamReader("postingFile.txt");
 			if (!File.Exists("tempFile.txt"))
 				tempWriter = File.CreateText("tempFile.txt");
@@ -43,6 +46,11 @@ namespace SearchEngine.Model
 			foreach (KeyValuePair<string, Term> tuple in terms)
 			{
 				currTerm = tuple.Key;
+				//currDoc = tuple.Value.d_locations
+				//docs[]
+				currDf = tuple.Value.d_locations.Count;
+
+
 /*
 				if (writeToEnd)
 				{
@@ -53,6 +61,8 @@ namespace SearchEngine.Model
 				//if (mainIndex.ContainsKey(currTerm))
 				if (mainIndexList.ContainsKey(currTerm))
 				{
+					//update number of files df
+					mainIndexList[currTerm] += currDf;
 					//get term's index
 					//writeLineNumber = mainIndex[currTerm];
 					writeLineNumber = mainIndexList[currTerm];
@@ -85,21 +95,8 @@ namespace SearchEngine.Model
 					else
 					{
 */
-						//have to add this term to index without value
-						/*
-						mainIndex[currTerm] = -1;
-						//get the position of the term in index
-						writeLineNumber = 0;
-						//foreach (KeyValuePair<string, int> indexItem in mainIndex)
-						foreach (KeyValuePair<string, int> indexItem in mainIndexList)
-						{
-							if (indexItem.Value == -1)
-								break;	
-							writeLineNumber++;
-						}
-						//mainIndex[currTerm] = writeLineNumber;
-						*/
-						mainIndexList[currTerm] = -1;
+						//update number of files df
+						mainIndexList[currTerm] = currDf;
 						writeLineNumber = mainIndexList.IndexOfKey(currTerm);
 						//move all the lines before to the new file
 						for (; lineCount < writeLineNumber - insertedTerms; lineCount++)
@@ -127,18 +124,6 @@ namespace SearchEngine.Model
 			File.Move("postingFile.txt", "postingFile.old");
 			File.Move("tempFile.txt", "postingFile.txt");
 			File.Delete("postingFile.old");
-			//go over mainIndex and set new line numbers
-			
-/*			
- 			int indexingHelper = 0;
-			SortedDictionary<string, int> tempIndex = new SortedDictionary<string, int>();
-			foreach (KeyValuePair<string, int> indexTerm in mainIndex)
-			{
-				tempIndex[indexTerm.Key] = indexingHelper;
-				indexingHelper++;
-			}
-			mainIndex = tempIndex;
-*/
         }
 
 

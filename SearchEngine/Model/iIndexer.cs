@@ -8,7 +8,7 @@ namespace SearchEngine.Model
 {
     interface iIndexer
     {
-//		void saveTerms(SortedDictionary<string, Term> terms);
-//        void startIndexing();
+        void saveTerms(SortedDictionary<string, Term> d_DateTerms, SortedDictionary<string, Term> d_WordTerms, SortedDictionary<string, Term> d_PercentallTerms, SortedDictionary<string, Term> d_PriceTerms, SortedDictionary<string, Term> d_NumberTerms, Dictionary<string, Doc> docs);
+        void startIndexing();
     }
 }

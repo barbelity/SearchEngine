@@ -16,9 +16,14 @@ namespace SearchEngine.Model
         //Mutex mStopwords = new Mutex();
         private string filesPath;
         StemmerInterface stemmer = new Stemmer();
-		public SortedDictionary<string, Term> d_allTerms = new SortedDictionary<string, Term>();
-		public Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
-		bool use_stem = false;
+        public SortedDictionary<string, Term> d_DateTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_WordTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_PercentallTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_PriceTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_NumberTerms = new SortedDictionary<string, Term>();
+        public Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
+        public Dictionary<string, int> d_currentDocTerms;
+        bool use_stem = false;
 
         private char[] charsToTrim = { ',', '.', ' ', ';', ':', '~', '|', '\n' };
         #region Regex's
@@ -51,16 +56,16 @@ namespace SearchEngine.Model
         public Parse(string path)
         {
             filesPath = path;
-			StopWords = ReadFile.readStopWords(@"C:\Users\Bar\Desktop\engineFiles\stopWords\stopwords.txt");
+            StopWords = ReadFile.readStopWords(@"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus\stopWords\stop_words.txt");
             addMonths();
         }
 
 
         public void startParsing()
         {
-			Indexer indexer = new Indexer();
-			int docsCount = 0;
-			string[] paths = ReadFile.getFilesPaths(filesPath);
+            iIndexer indexer = new Indexer();
+            int docsCount = 0;
+            string[] paths = ReadFile.getFilesPaths(filesPath);
             foreach (string filePath in paths)
             {
                 string[] docs = ReadFile.fileToDocString(filePath);
@@ -69,27 +74,37 @@ namespace SearchEngine.Model
                     if (doc.Length > 3)
                     {
                         parseDoc(doc);
-						docsCount++;
-						if (docsCount == 2000)
-						{
-							indexer.saveTerms(d_allTerms);
-							d_allTerms = new SortedDictionary<string, Term>();
-							docsCount = 0;
-						}
+                        docsCount++;
+                        if (docsCount == 2000)
+                        {
+                            //indexer.saveTerms(d_DateTerms, d_WordTerms, d_PercentallTerms, d_PriceTerms, d_NumberTerms, d_docs);
+                            d_WordTerms = new SortedDictionary<string, Term>();
+                            d_DateTerms = new SortedDictionary<string, Term>();
+                            d_PercentallTerms = new SortedDictionary<string, Term>();
+                            d_PriceTerms = new SortedDictionary<string, Term>();
+                            d_NumberTerms = new SortedDictionary<string, Term>();
+                            docsCount = 0;
+                        }
                         //int j = 1;
                     }
                 }
             }
-			//saving the remainder of terms
-			indexer.saveTerms(d_allTerms);
-			d_allTerms = new SortedDictionary<string, Term>();
-			docsCount = 0;
-            //int i = 1;
+            //saving the remainder of terms
+            //indexer.saveTerms(d_DateTerms, d_WordTerms, d_PercentallTerms, d_PriceTerms, d_NumberTerms, d_docs);
+            d_WordTerms = null;
+            d_DateTerms = null;
+            d_PercentallTerms = null;
+            d_PriceTerms = null;
+            d_NumberTerms = null;
+            docsCount = 0;
+            System.Console.WriteLine("finished all at:" + DateTime.Now);
+            int i = 1;
         }
 
 
         public void parseDoc(string docRaw)
         {
+            d_currentDocTerms = new Dictionary<string, int>();
             //get name
             string[] split = docRaw.Split(new string[] { "<DOCNO>" }, StringSplitOptions.None);
             split = split[1].Split(new string[] { "</DOCNO>" }, StringSplitOptions.None);
@@ -108,10 +123,10 @@ namespace SearchEngine.Model
 
             split = split[1].Split(new string[] { "</TEXT>" }, StringSplitOptions.None);
             string text = split[0];
-            
-			//get terms from text
+
+            //get terms from text
             int numOfTerms = 0;//stores the number of terms in doc
-			numOfTerms += getTerms(ref text, datesInOrderRegex, "Date", docName);
+            numOfTerms += getTerms(ref text, datesInOrderRegex, "Date", docName);
             numOfTerms += getTerms(ref text, datesMonthFirstRegex, "Date", docName);
             numOfTerms += getTerms(ref text, yearsRegex, "Year", docName);
             numOfTerms += getTerms(ref text, rangeReg, "Range", docName);
@@ -121,28 +136,37 @@ namespace SearchEngine.Model
             numOfTerms += getTerms(ref text, namesReg, "Name", docName);
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
             //update numOfTerms - if we put it in constructor of doc it saves time
-			d_docs[docName].termsCount = numOfTerms;
+            d_docs[docName].termsCount = numOfTerms;
         }
-			//Dictionary<string, Term> d_terms = new Dictionary<string, Term>();
-            //string t = "The 1999 23-25 23 January-23 a b 44% Ziv Kaspersky edition of the skypee 10.6 percent : Dollars 20.6m Dollars 5.3bn fgdf dfgdf  $100 million : Dollars 900,000 , Dollars 1.7320d January 23, 1999. feb 23, oct 1988, 1 oct 1988 between 18 and 24";
+        //Dictionary<string, Term> d_terms = new Dictionary<string, Term>();
+        //string t = "The 1999 23-25 23 January-23 a b 44% Ziv Kaspersky edition of the skypee 10.6 percent : Dollars 20.6m Dollars 5.3bn fgdf dfgdf  $100 million : Dollars 900,000 , Dollars 1.7320d January 23, 1999. feb 23, oct 1988, 1 oct 1988 between 18 and 24";
 
-        private void addTermToDic(string term, string docName, int index, ref int numOfTerms, string type)
+        private void addTermToDic(SortedDictionary<string, Term> d_terms, string term, string docName, int index, ref int numOfTerms, string type)
         {
-            if (!d_allTerms.ContainsKey(term))
+            if (!d_terms.ContainsKey(term))
             {
-                d_allTerms[term] = new Term(type, term);
+                d_terms[term] = new Term(type, term);
                 numOfTerms++;
             }
-            d_allTerms[term].addPosition(docName, index);
-            /*
+            d_terms[term].addPosition(docName, index);
+            int tfDoc;
             // change max tf in doc if needed
-            int tfDoc = d_allTerms[term].returnTF(docName);
+            if (d_currentDocTerms.ContainsKey(term))
+            {
+                tfDoc = ++d_currentDocTerms[term];
+            }
+            else
+            {
+                d_currentDocTerms[term] = 1;
+                tfDoc = 1;
+            }
+
             if (d_docs[docName].maxtfCount < tfDoc)
             {
                 d_docs[docName].maxtfString = term;
                 d_docs[docName].maxtfCount = tfDoc;
             }
-             */
+
 
         }
 
@@ -158,128 +182,124 @@ namespace SearchEngine.Model
                 if (StopWords.ContainsKey(termString) || termString.Length <= 2)
                     continue;
 
-                if (type == "Price" || type == "Range" || type == "Percent" || type == "Price" || type == "Date" || type == "Year" || type == "Name")
+                if (!(type == "Word") && !(type == "Number"))
                 {
                     string clearTerm = new String('#', term.Length - 2);
                     text = text.Substring(0, term.Index) + " " + clearTerm + " " + text.Substring(term.Index + term.Length);
                 }
-
-                if (type == "Range")
+                DateTime convertedDate;
+                switch (type)
                 {
-                    MatchCollection numbers = justANumberReg.Matches(termString);
-                    int a, b;
-                    int.TryParse(numbers[1].ToString(), out b);
-                    int.TryParse(numbers[0].ToString(), out a);
-                    if (Math.Abs(a - b) < 20)
-                    {
-                        for (; a <= b; a++)
+                    case "Range":
+                        MatchCollection numbers = justANumberReg.Matches(termString);
+                        int a, b;
+                        int.TryParse(numbers[1].ToString(), out b);
+                        int.TryParse(numbers[0].ToString(), out a);
+                        if (Math.Abs(a - b) < 20)
                         {
-                            addTermToDic(a.ToString(), docName, term.Index, ref numOfTerms, "Number");
-                        }
-                    }
-                    else
-                    {
-                        addTermToDic(a.ToString(), docName, term.Index, ref numOfTerms, "Number");
-                        addTermToDic(b.ToString(), docName, term.Index, ref numOfTerms, "Number");
-                    }
-                }
-
-                else if (type == "Percent")
-                {
-                    string[] percentSplit = termString.Split(' ', '%');
-                    float percent;
-                    float.TryParse(percentSplit[0], out percent);
-                    addTermToDic((percent * 0.01).ToString("P"), docName, term.Index, ref numOfTerms, "Percent");
-                }
-
-                else if (type == "Price")
-                {
-                    MatchCollection number = numReg.Matches(termString);
-                    float price;
-                    float.TryParse(number[0].ToString(), out price);
-                    if (termString.Contains('m'))
-                    {
-                        price = price * 1000000;
-                    }
-                    else if (termString.Contains('n'))
-                    {
-                        price = price * 1000000000;
-                    }
-                    addTermToDic(price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
-                }
-
-                else if (type == "Date")
-                {
-                    try
-                    {
-                        //with th
-                        int thIndex = termString.IndexOf("th");
-                        if (thIndex >= 0)
-                        {
-                            termString = termString.Remove(thIndex, 2);
-                        }
-                        DateTime convertedDate = Convert.ToDateTime(termString);
-                        termString = convertedDate.ToShortDateString();
-                        addTermToDic(termString, docName, term.Index, ref numOfTerms, "Date");
-                    }
-                    catch (Exception e)
-                    {
-                        //manually convert
-                        string dd, mm, yyyy;
-                        string[] termStringSplited = termString.Split(' ');
-                        if (months.ContainsKey(termStringSplited[1]))
-                        {
-                            dd = termStringSplited[0];
-                            mm = months[termStringSplited[1]];
-                            if (termStringSplited.Length == 3)
+                            for (; a <= b; a++)
                             {
-                                yyyy = termStringSplited[2];
-                            }
-                            else
-                            {
-                                yyyy = "2015";
+                                addTermToDic(d_NumberTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
                             }
                         }
                         else
                         {
-                            mm = months[termStringSplited[0]];
-                            if (termStringSplited.Length == 3)
+                            addTermToDic(d_NumberTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
+                            addTermToDic(d_NumberTerms, b.ToString(), docName, term.Index, ref numOfTerms, "Number");
+                        }
+                        break;
+                    case "Percent":
+                        string[] percentSplit = termString.Split(' ', '%');
+                        float percent;
+                        float.TryParse(percentSplit[0], out percent);
+                        addTermToDic(d_PercentallTerms, (percent * 0.01).ToString("P"), docName, term.Index, ref numOfTerms, "Percent");
+                        break;
+                    case "Price":
+                        MatchCollection number = numReg.Matches(termString);
+                        float price;
+                        float.TryParse(number[0].ToString(), out price);
+                        if (termString.Contains('m'))
+                        {
+                            price = price * 1000000;
+                        }
+                        else if (termString.Contains('n'))
+                        {
+                            price = price * 1000000000;
+                        }
+                        addTermToDic(d_PriceTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
+                        break;
+                    case "Date":
+                        try
+                        {
+                            //with th
+                            int thIndex = termString.IndexOf("th");
+                            if (thIndex >= 0)
                             {
-                                dd = termStringSplited[1].Trim(',');
-                                yyyy = termStringSplited[2];
+                                termString = termString.Remove(thIndex, 2);
                             }
-                            else
+                            convertedDate = Convert.ToDateTime(termString);
+                            termString = convertedDate.ToShortDateString();
+                            addTermToDic(d_DateTerms, termString, docName, term.Index, ref numOfTerms, "Date");
+                        }
+                        catch (Exception e)
+                        {
+                            //manually convert
+                            string dd, mm, yyyy;
+                            string[] termStringSplited = termString.Split(' ');
+                            if (months.ContainsKey(termStringSplited[1]))
                             {
-                                if (termStringSplited[1].Length <= 2)
+                                dd = termStringSplited[0];
+                                mm = months[termStringSplited[1]];
+                                if (termStringSplited.Length == 3)
                                 {
-                                    dd = termStringSplited[1];
-                                    yyyy = "2015";
+                                    yyyy = termStringSplited[2];
                                 }
                                 else
                                 {
-                                    yyyy = termStringSplited[1];
-                                    dd = "01";
+                                    yyyy = "2015";
                                 }
                             }
+                            else
+                            {
+                                mm = months[termStringSplited[0]];
+                                if (termStringSplited.Length == 3)
+                                {
+                                    dd = termStringSplited[1].Trim(',');
+                                    yyyy = termStringSplited[2];
+                                }
+                                else
+                                {
+                                    if (termStringSplited[1].Length <= 2)
+                                    {
+                                        dd = termStringSplited[1];
+                                        yyyy = "2015";
+                                    }
+                                    else
+                                    {
+                                        yyyy = termStringSplited[1];
+                                        dd = "01";
+                                    }
+                                }
+                            }
+                            addTermToDic(d_DateTerms, dd + "/" + mm + "/" + yyyy, docName, term.Index, ref numOfTerms, "Date");
                         }
-                        addTermToDic(dd + "/" + mm + "/" + yyyy, docName, term.Index, ref numOfTerms, "Date");
-                    }
+                        break;
+                    case "Year":
+                        convertedDate = new DateTime(int.Parse(termString), 1, 1);
+                        termString = convertedDate.ToShortDateString();
+                        addTermToDic(d_DateTerms, termString, docName, term.Index, ref numOfTerms, "Date");
+                        break;
+
+                    default:
+                        //stemmer
+                        if (use_stem)
+                            termString = stemmer.stemTerm(termString);
+                        addTermToDic(d_WordTerms, termString, docName, term.Index, ref numOfTerms, type);
+                        break;
                 }
 
-                else if (type == "Year")
-                {
-                    DateTime convertedDate = new DateTime(int.Parse(termString), 1, 1);
-                    termString = convertedDate.ToShortDateString();
-                    addTermToDic(termString, docName, term.Index, ref numOfTerms, "Date");
-                }
 
-                else // everything else
-                {
-                    //stemmer
-                    if (use_stem)
-                        termString = stemmer.stemTerm(termString);
-                    addTermToDic(termString, docName, term.Index, ref numOfTerms, type);
-                }
+
             }
 
             return numOfTerms;

@@ -10,11 +10,11 @@ namespace SearchEngine.Model
         public string type { get; set; }
         public string termString { get; set; }
         // <docName,positions> example positions="4,7,8,"
-        public Dictionary<string, string> d_locations { get; set; }
+        public Dictionary<string, StringBuilder> d_locations { get; set; }
 
         public Term(string type, string termString)
         {
-            d_locations = new Dictionary<string, string>();
+            d_locations = new Dictionary<string, StringBuilder>();
             this.type = type;
             this.termString = termString;
         }
@@ -28,28 +28,28 @@ namespace SearchEngine.Model
         {
             if (!d_locations.ContainsKey(docNme))
             {
-                d_locations[docNme] = p + ",";
+                d_locations[docNme] = new StringBuilder(p + ",");
+
             }
             else
             {
-                d_locations[docNme] += p + ",";
+                d_locations[docNme].Append(p + ",");
             }
 
         }
         public override string ToString()
         {
-            string ans = "";
+            StringBuilder ans = new StringBuilder();
             //ans = termString + "=|";
             foreach (var pair in d_locations)
             {
-                ans += pair.Key + ";" + pair.Value.Count(x => x == ',') + ":" + pair.Value + "|";
+                ans.Append(pair.Key + ";");
+                ans.Append(pair.Value);
+                ans.Append('|');
             }
-            return ans;
+            return ans.ToString();
         }
 
-        public int returnTF(string docName)
-        {
-            return d_locations[docName].Count(x => x == ',');
-        }
+
     }
 }

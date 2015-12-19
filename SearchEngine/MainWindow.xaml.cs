@@ -40,6 +40,11 @@ namespace SearchEngine
 
             if (txtbx_filesPath.Text.Length != 0)
             {
+                if (!Directory.Exists(txtbx_filesPath.Text))
+                {
+                    MessageBox.Show("Please enter a valid Data Files path");
+                    return;
+                }
                 filesPath = txtbx_filesPath.Text;
             }
             else
@@ -49,6 +54,11 @@ namespace SearchEngine
             }
             if (txtbx_postingPath.Text.Length != 0)
             {
+                if (!Directory.Exists(txtbx_postingPath.Text))
+                {
+                    MessageBox.Show("Please enter a valid Posting Files path");
+                    return;
+                }
                 postingPath = txtbx_postingPath.Text;
             }
             else
@@ -56,8 +66,7 @@ namespace SearchEngine
                 MessageBox.Show("Please enter Posting Files path");
                 return;
             }
-            filesPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus";
-            postingPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\posting";
+
             try
             {
                 File.Create(postingPath + @"\abNumsPosting.txt").Dispose();
@@ -86,6 +95,11 @@ namespace SearchEngine
         {
             if (txtbx_postingPath.Text.Length != 0)
             {
+                if (!Directory.Exists(txtbx_postingPath.Text))
+                {
+                    MessageBox.Show("Please enter a valid Posting Files path");
+                    return;
+                }
                 postingPath = txtbx_postingPath.Text;
             }
             else
@@ -93,8 +107,7 @@ namespace SearchEngine
                 MessageBox.Show("Please enter Posting Files path");
                 return;
             }
-            filesPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus";
-            postingPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\posting";
+
             try
             {
                 File.Delete(postingPath + @"\abNumsPosting.txt");
@@ -119,6 +132,11 @@ namespace SearchEngine
         {
             if (txtbx_postingPath.Text.Length != 0)
             {
+                if (!Directory.Exists(txtbx_postingPath.Text))
+                {
+                    MessageBox.Show("Please enter a valid Posting Files path");
+                    return;
+                }
                 postingPath = txtbx_postingPath.Text;
             }
             else
@@ -126,7 +144,7 @@ namespace SearchEngine
                 MessageBox.Show("Please enter Posting Files path");
                 return;
             }
-            postingPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\posting";
+
             try
             {
                 string posting = File.ReadAllText(postingPath + @"\abNumsPosting.txt");
@@ -153,6 +171,12 @@ namespace SearchEngine
         {
             if (txtbx_postingPath.Text.Length != 0)
             {
+                if (!Directory.Exists(txtbx_postingPath.Text))
+                {
+                    MessageBox.Show("Please enter a valid Posting Files path");
+                    return;
+                }
+                
                 postingPath = txtbx_postingPath.Text;
             }
             else
@@ -160,7 +184,7 @@ namespace SearchEngine
                 MessageBox.Show("Please enter Posting Files path");
                 return;
             }
-            postingPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\posting";
+
             indexer = new Indexer(postingPath, true);
         }
     }

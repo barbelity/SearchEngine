@@ -201,7 +201,8 @@ namespace SearchEngine.Model
             numOfTerms += getTerms(ref text, namesReg, "Name", docName);
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
             //update numOfTerms - if we put it in constructor of doc it saves time
-            d_docs[docName].termsCount = numOfTerms;
+            doc.termsCount = numOfTerms;
+            doc.d_TermsCount = null;
         }
 
         static private void addTermToDic(SortedDictionary<string, Term> d_terms, string term, string docName, int index, ref int numOfTerms, string type)

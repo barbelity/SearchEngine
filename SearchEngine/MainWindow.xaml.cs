@@ -29,36 +29,24 @@ namespace SearchEngine
         string filesPath, postingPath;
         public MainWindow()
         {
-            postingPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\posting";
-            filesPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus";
 
-            try
+
+
+
+        }
+        private void vModelChanged(int type, string value)
+        {
+            if (type == 1)
             {
-                File.Create(postingPath + @"\abNumsPosting.txt").Dispose();
-                File.Create(postingPath + @"\cfPosting.txt").Dispose();
-                File.Create(postingPath + @"\gmPosting.txt").Dispose();
-                File.Create(postingPath + @"\nrPosting.txt").Dispose();
-                File.Create(postingPath + @"\szPosting.txt").Dispose();
+                MessageBox.Show(value);
+
             }
-            catch (Exception exp)
-            {
-
-                return;
-            }
-
-            System.Console.WriteLine("started parsing at:" + DateTime.Now);
-            indexer = new Indexer(postingPath);
-            parser = new Parse(filesPath, indexer);
-            Thread thread = new Thread(new ThreadStart(parser.startParsing));
-            thread.Start();
-
-
 
         }
 
         private void btn_startParsing_Click(object sender, RoutedEventArgs e)
         {
-
+          
             if (txtbx_filesPath.Text.Length != 0)
             {
                 if (!Directory.Exists(txtbx_filesPath.Text))
@@ -88,6 +76,8 @@ namespace SearchEngine
                 return;
             }
 
+
+
             try
             {
                 File.Create(postingPath + @"\abNumsPosting.txt").Dispose();
@@ -104,7 +94,8 @@ namespace SearchEngine
 
             System.Console.WriteLine("started parsing at:" + DateTime.Now);
             indexer = new Indexer(postingPath);
-            parser = new Parse(filesPath, indexer);
+            parser = new Parse(filesPath, indexer, cb_Stemmeing.IsChecked.Value);
+            parser.ModelChanged += vModelChanged;
             Thread thread = new Thread(new ThreadStart(parser.startParsing));
             thread.Start();
             System.Console.WriteLine("finished all at:" + DateTime.Now);

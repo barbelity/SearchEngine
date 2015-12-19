@@ -11,6 +11,9 @@ namespace SearchEngine.Model
 {
     class Parse : iParse
     {
+        public delegate void ModelFunc(int type, string value);
+        public event ModelFunc ModelChanged;
+
         static Dictionary<string, string> months = new Dictionary<string, string>();
         static private Dictionary<string, bool> StopWords;
         //Mutex mStopwords = new Mutex();
@@ -23,7 +26,7 @@ namespace SearchEngine.Model
         public static SortedDictionary<string, Term> d_nrTerms = new SortedDictionary<string, Term>();
         public static SortedDictionary<string, Term> d_szTerms = new SortedDictionary<string, Term>();
         public static Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
-        
+
 
         static bool use_stem = false;
 
@@ -55,8 +58,9 @@ namespace SearchEngine.Model
         #endregion
 
         static iIndexer _indexer;
-        public Parse(string Path, iIndexer indexer)
+        public Parse(string Path, iIndexer indexer, bool stemming)
         {
+            use_stem = stemming;
             filesPath = Path;
             _indexer = indexer;
             StopWords = ReadFile.readStopWords(Path + @"\stop_words.txt");
@@ -69,9 +73,10 @@ namespace SearchEngine.Model
         {
 
             string[] paths = ReadFile.getFilesPaths(filesPath);
-            int i=0,j = 0;
+            int i = 0, j = 0;
             foreach (string filePath in paths)
             {
+                //runs every file in a new thread
                 a_Threads[i] = new Thread(new ParameterizedThreadStart(ThreadParsing));
                 a_Threads[i].Start(filePath);
 
@@ -83,7 +88,7 @@ namespace SearchEngine.Model
                     {
                         t.Join();
                     }
-
+                    //every 60 files start indexing
                     if (j == 60)
                     {
                         j = 0;
@@ -105,7 +110,7 @@ namespace SearchEngine.Model
                         d_nrTerms = new SortedDictionary<string, Term>();
                         d_szTerms = new SortedDictionary<string, Term>();
                     }
-                    
+
                 }
 
 
@@ -136,6 +141,9 @@ namespace SearchEngine.Model
             d_gmTerms = null;
             d_nrTerms = null;
             d_szTerms = null;
+            //save all list data for import
+            _indexer.saveLists();
+            ModelChanged(1, "Finshed parsing and indexing docs");
             System.Console.WriteLine("finished all at:" + DateTime.Now);
 
         }
@@ -166,7 +174,7 @@ namespace SearchEngine.Model
         {
 
             //get name
-            
+
             string[] split = docRaw.Split(new string[] { "<DOCNO>" }, StringSplitOptions.None);
             split = split[1].Split(new string[] { "</DOCNO>" }, StringSplitOptions.None);
             string docName = split[0].Trim(charsToTrim);
@@ -186,8 +194,9 @@ namespace SearchEngine.Model
             string text = split[0];
 
             doc.d_TermsCount = new Dictionary<string, int>();
-            lock (d_docs) { 
-            d_docs[docName] = doc;
+            lock (d_docs)
+            {
+                d_docs[docName] = doc;
             }
             //get terms from text
             int numOfTerms = 0;//stores the number of terms in doc
@@ -248,7 +257,7 @@ namespace SearchEngine.Model
                 if (StopWords.ContainsKey(termString) || termString.Length <= 2)
                     continue;
 
-                 if (!(type == "Word") && !(type == "Number"))
+                if (!(type == "Word") && !(type == "Number"))
                 {
                     string clearTerm = new String('#', term.Length - 2);
                     text = text.Substring(0, term.Index) + " " + clearTerm + " " + text.Substring(term.Index + term.Length);
@@ -358,8 +367,16 @@ namespace SearchEngine.Model
 
                     default:
                         //stemmer
+
                         if (use_stem)
-                            termString = stemmer.stemTerm(termString);
+                        {
+                            lock (stemmer)
+                            {
+                                termString = stemmer.stemTerm(termString);
+                            }
+                        }
+
+
                         //insert to correct dictionary
                         if (termString[0] >= 's')
                             addTermToDic(d_szTerms, termString, docName, term.Index, ref numOfTerms, type);

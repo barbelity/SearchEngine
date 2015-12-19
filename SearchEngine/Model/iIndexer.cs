@@ -9,5 +9,6 @@ namespace SearchEngine.Model
     interface iIndexer
     {
 		void startIndexing(ref SortedDictionary<string, Term>[] d_terms);
+        void saveLists();
     }
 }

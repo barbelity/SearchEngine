@@ -20,7 +20,6 @@ namespace SearchEngine.Model
         StreamReader postingReader;
         StreamWriter tempWriter;
         string postingPath;
-        private bool v;
 
         public Indexer(string postingPath)
         {

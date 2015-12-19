@@ -77,24 +77,24 @@ namespace SearchEngine.Model
                         docsCount++;
                         if (docsCount == 4000)
                         {
-							indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
-							d_abNumTerms = new SortedDictionary<string, Term>();
-							d_cfTerms = new SortedDictionary<string, Term>();
-							d_gmTerms = new SortedDictionary<string, Term>();
-							d_nrTerms = new SortedDictionary<string, Term>();
-							d_szTerms = new SortedDictionary<string, Term>();
+                            indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
+                            d_abNumTerms = new SortedDictionary<string, Term>();
+                            d_cfTerms = new SortedDictionary<string, Term>();
+                            d_gmTerms = new SortedDictionary<string, Term>();
+                            d_nrTerms = new SortedDictionary<string, Term>();
+                            d_szTerms = new SortedDictionary<string, Term>();
                             docsCount = 0;
                         }
                     }
                 }
             }
             //saving the remainder of terms
-			indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
-			d_abNumTerms = null;
-			d_cfTerms = null;
-			d_gmTerms = null;
-			d_nrTerms = null;
-			d_szTerms = null;
+            indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
+            d_abNumTerms = null;
+            d_cfTerms = null;
+            d_gmTerms = null;
+            d_nrTerms = null;
+            d_szTerms = null;
             docsCount = 0;
             System.Console.WriteLine("finished all at:" + DateTime.Now);
             int i = 1;
@@ -194,20 +194,20 @@ namespace SearchEngine.Model
                         {
                             for (; a <= b; a++)
                             {
-								addTermToDic(d_abNumTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
+                                addTermToDic(d_abNumTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
                             }
                         }
                         else
                         {
-							addTermToDic(d_abNumTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
-							addTermToDic(d_abNumTerms, b.ToString(), docName, term.Index, ref numOfTerms, "Number");
+                            addTermToDic(d_abNumTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
+                            addTermToDic(d_abNumTerms, b.ToString(), docName, term.Index, ref numOfTerms, "Number");
                         }
                         break;
                     case "Percent":
                         string[] percentSplit = termString.Split(' ', '%');
                         float percent;
                         float.TryParse(percentSplit[0], out percent);
-						addTermToDic(d_abNumTerms, (percent * 0.01).ToString("P"), docName, term.Index, ref numOfTerms, "Percent");
+                        addTermToDic(d_abNumTerms, (percent * 0.01).ToString("P"), docName, term.Index, ref numOfTerms, "Percent");
                         break;
                     case "Price":
                         MatchCollection number = numReg.Matches(termString);
@@ -221,7 +221,7 @@ namespace SearchEngine.Model
                         {
                             price = price * 1000000000;
                         }
-						addTermToDic(d_abNumTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
+                        addTermToDic(d_abNumTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
                         break;
                     case "Date":
                         try
@@ -234,7 +234,7 @@ namespace SearchEngine.Model
                             }
                             convertedDate = Convert.ToDateTime(termString);
                             termString = convertedDate.ToShortDateString();
-							addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, "Date");
+                            addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, "Date");
                         }
                         catch (Exception e)
                         {
@@ -276,30 +276,30 @@ namespace SearchEngine.Model
                                     }
                                 }
                             }
-							addTermToDic(d_abNumTerms, dd + "/" + mm + "/" + yyyy, docName, term.Index, ref numOfTerms, "Date");
+                            addTermToDic(d_abNumTerms, dd + "/" + mm + "/" + yyyy, docName, term.Index, ref numOfTerms, "Date");
                         }
                         break;
                     case "Year":
                         convertedDate = new DateTime(int.Parse(termString), 1, 1);
                         termString = convertedDate.ToShortDateString();
-						addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, "Date");
+                        addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, "Date");
                         break;
 
                     default:
                         //stemmer
                         if (use_stem)
                             termString = stemmer.stemTerm(termString);
-						//insert to correct dictionary
-						if (termString[0] >= 's')
-							addTermToDic(d_szTerms, termString, docName, term.Index, ref numOfTerms, type);
-						else if (termString[0] >= 'n')
-							addTermToDic(d_nrTerms, termString, docName, term.Index, ref numOfTerms, type);
-						else if (termString[0] >= 'g')
-							addTermToDic(d_gmTerms, termString, docName, term.Index, ref numOfTerms, type);
-						else if (termString[0] >= 'c')
-							addTermToDic(d_cfTerms, termString, docName, term.Index, ref numOfTerms, type);
-						else
-							addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, type);
+                        //insert to correct dictionary
+                        if (termString[0] >= 's')
+                            addTermToDic(d_szTerms, termString, docName, term.Index, ref numOfTerms, type);
+                        else if (termString[0] >= 'n')
+                            addTermToDic(d_nrTerms, termString, docName, term.Index, ref numOfTerms, type);
+                        else if (termString[0] >= 'g')
+                            addTermToDic(d_gmTerms, termString, docName, term.Index, ref numOfTerms, type);
+                        else if (termString[0] >= 'c')
+                            addTermToDic(d_cfTerms, termString, docName, term.Index, ref numOfTerms, type);
+                        else
+                            addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, type);
                         break;
                 }
             }

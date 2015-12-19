@@ -52,22 +52,24 @@ namespace SearchEngine.Model
 
         #endregion
 
-
-        public Parse(string path)
+        iIndexer indexer;
+        public Parse(string filesPath, iIndexer indexer)
         {
-            filesPath = path;
-            StopWords = ReadFile.readStopWords(@"C:\Users\Bar\Desktop\engineFiles\stopWords\stopwords.txt");
+            this.filesPath = filesPath;
+            this.indexer = indexer;
+            StopWords = ReadFile.readStopWords(filesPath + @"\stop_words.txt");
             addMonths();
         }
 
 
         public void startParsing()
         {
-            iIndexer indexer = new Indexer();
+            
             int docsCount = 0;
             string[] paths = ReadFile.getFilesPaths(filesPath);
             foreach (string filePath in paths)
             {
+                if(System.IO.Path.GetFileName(filePath)== "stop_words.txt") continue;
                 string[] docs = ReadFile.fileToDocString(filePath);
                 foreach (string doc in docs)
                 {

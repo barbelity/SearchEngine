@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,14 +19,39 @@ namespace SearchEngine.Model
 
         StreamReader postingReader;
         StreamWriter tempWriter;
+        string postingPath;
+        private bool v;
 
-        public Indexer()
+        public Indexer(string postingPath)
         {
+            this.postingPath = postingPath;
 			mainIndexList1 = new SortedList<string, int>();
 			mainIndexList2 = new SortedList<string, int>();
 			mainIndexList3 = new SortedList<string, int>();
 			mainIndexList4 = new SortedList<string, int>();
 			mainIndexList5 = new SortedList<string, int>();
+        }
+
+        public Indexer(string postingPath, bool v)
+        {
+            this.postingPath = postingPath;
+            IFormatter formatter = new BinaryFormatter();
+
+            try
+            {
+                mainIndexList1 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list1.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+                mainIndexList2 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list2.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+                mainIndexList3 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list3.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+                mainIndexList4 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list4.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+                mainIndexList5 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list5.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+
         }
 
         public void saveTerms(SortedDictionary<string, Term> terms, string fileName, SortedList<string, int> mainIndexList)
@@ -34,7 +61,7 @@ namespace SearchEngine.Model
             int insertedTerms = 0;//we must keep trace on how many new terms added
             string currTerm;
             string currLine = "";
-
+            fileName = postingPath + "\\" + fileName;
             //statistics
             int currDf;
             postingReader = new StreamReader(fileName);
@@ -106,6 +133,21 @@ namespace SearchEngine.Model
 			saveTerms(d_nr, "nrPosting.txt", mainIndexList4);
 			saveTerms(d_sz, "szPosting.txt", mainIndexList5);
 			System.Console.WriteLine("finished indexing at:" + DateTime.Now);
+        }
+
+        public void saveLists()
+        {
+            File.Delete(postingPath + @"\list1.bin");
+            File.Delete(postingPath + @"\list2.bin");
+            File.Delete(postingPath + @"\list3.bin");
+            File.Delete(postingPath + @"\list4.bin");
+            File.Delete(postingPath + @"\list5.bin");
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(new FileStream(postingPath + @"\list1.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList1);
+            formatter.Serialize(new FileStream(postingPath + @"\list2.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList2);
+            formatter.Serialize(new FileStream(postingPath + @"\list3.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList3);
+            formatter.Serialize(new FileStream(postingPath + @"\list4.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList4);
+            formatter.Serialize(new FileStream(postingPath + @"\list5.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList5);
         }
     }
 }

@@ -16,11 +16,11 @@ namespace SearchEngine.Model
         //Mutex mStopwords = new Mutex();
         private string filesPath;
         StemmerInterface stemmer = new Stemmer();
-        public SortedDictionary<string, Term> d_DateTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_WordTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_PercentallTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_PriceTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_NumberTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_abNumTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_cfTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_gmTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_nrTerms = new SortedDictionary<string, Term>();
+        public SortedDictionary<string, Term> d_szTerms = new SortedDictionary<string, Term>();
         public Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
         public Dictionary<string, int> d_currentDocTerms;
         bool use_stem = false;
@@ -56,7 +56,7 @@ namespace SearchEngine.Model
         public Parse(string path)
         {
             filesPath = path;
-            StopWords = ReadFile.readStopWords(@"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus\stopWords\stop_words.txt");
+            StopWords = ReadFile.readStopWords(@"C:\Users\Bar\Desktop\engineFiles\stopWords\stopwords.txt");
             addMonths();
         }
 
@@ -75,27 +75,26 @@ namespace SearchEngine.Model
                     {
                         parseDoc(doc);
                         docsCount++;
-                        if (docsCount == 2000)
+                        if (docsCount == 4000)
                         {
-                            //indexer.saveTerms(d_DateTerms, d_WordTerms, d_PercentallTerms, d_PriceTerms, d_NumberTerms, d_docs);
-                            d_WordTerms = new SortedDictionary<string, Term>();
-                            d_DateTerms = new SortedDictionary<string, Term>();
-                            d_PercentallTerms = new SortedDictionary<string, Term>();
-                            d_PriceTerms = new SortedDictionary<string, Term>();
-                            d_NumberTerms = new SortedDictionary<string, Term>();
+							indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
+							d_abNumTerms = new SortedDictionary<string, Term>();
+							d_cfTerms = new SortedDictionary<string, Term>();
+							d_gmTerms = new SortedDictionary<string, Term>();
+							d_nrTerms = new SortedDictionary<string, Term>();
+							d_szTerms = new SortedDictionary<string, Term>();
                             docsCount = 0;
                         }
-                        //int j = 1;
                     }
                 }
             }
             //saving the remainder of terms
-            //indexer.saveTerms(d_DateTerms, d_WordTerms, d_PercentallTerms, d_PriceTerms, d_NumberTerms, d_docs);
-            d_WordTerms = null;
-            d_DateTerms = null;
-            d_PercentallTerms = null;
-            d_PriceTerms = null;
-            d_NumberTerms = null;
+			indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
+			d_abNumTerms = null;
+			d_cfTerms = null;
+			d_gmTerms = null;
+			d_nrTerms = null;
+			d_szTerms = null;
             docsCount = 0;
             System.Console.WriteLine("finished all at:" + DateTime.Now);
             int i = 1;
@@ -138,8 +137,6 @@ namespace SearchEngine.Model
             //update numOfTerms - if we put it in constructor of doc it saves time
             d_docs[docName].termsCount = numOfTerms;
         }
-        //Dictionary<string, Term> d_terms = new Dictionary<string, Term>();
-        //string t = "The 1999 23-25 23 January-23 a b 44% Ziv Kaspersky edition of the skypee 10.6 percent : Dollars 20.6m Dollars 5.3bn fgdf dfgdf  $100 million : Dollars 900,000 , Dollars 1.7320d January 23, 1999. feb 23, oct 1988, 1 oct 1988 between 18 and 24";
 
         private void addTermToDic(SortedDictionary<string, Term> d_terms, string term, string docName, int index, ref int numOfTerms, string type)
         {
@@ -166,8 +163,6 @@ namespace SearchEngine.Model
                 d_docs[docName].maxtfString = term;
                 d_docs[docName].maxtfCount = tfDoc;
             }
-
-
         }
 
         private int getTerms(ref string text, Regex regex, string type, string docName)
@@ -199,20 +194,20 @@ namespace SearchEngine.Model
                         {
                             for (; a <= b; a++)
                             {
-                                addTermToDic(d_NumberTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
+								addTermToDic(d_abNumTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
                             }
                         }
                         else
                         {
-                            addTermToDic(d_NumberTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
-                            addTermToDic(d_NumberTerms, b.ToString(), docName, term.Index, ref numOfTerms, "Number");
+							addTermToDic(d_abNumTerms, a.ToString(), docName, term.Index, ref numOfTerms, "Number");
+							addTermToDic(d_abNumTerms, b.ToString(), docName, term.Index, ref numOfTerms, "Number");
                         }
                         break;
                     case "Percent":
                         string[] percentSplit = termString.Split(' ', '%');
                         float percent;
                         float.TryParse(percentSplit[0], out percent);
-                        addTermToDic(d_PercentallTerms, (percent * 0.01).ToString("P"), docName, term.Index, ref numOfTerms, "Percent");
+						addTermToDic(d_abNumTerms, (percent * 0.01).ToString("P"), docName, term.Index, ref numOfTerms, "Percent");
                         break;
                     case "Price":
                         MatchCollection number = numReg.Matches(termString);
@@ -226,7 +221,7 @@ namespace SearchEngine.Model
                         {
                             price = price * 1000000000;
                         }
-                        addTermToDic(d_PriceTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
+						addTermToDic(d_abNumTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
                         break;
                     case "Date":
                         try
@@ -239,7 +234,7 @@ namespace SearchEngine.Model
                             }
                             convertedDate = Convert.ToDateTime(termString);
                             termString = convertedDate.ToShortDateString();
-                            addTermToDic(d_DateTerms, termString, docName, term.Index, ref numOfTerms, "Date");
+							addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, "Date");
                         }
                         catch (Exception e)
                         {
@@ -281,25 +276,32 @@ namespace SearchEngine.Model
                                     }
                                 }
                             }
-                            addTermToDic(d_DateTerms, dd + "/" + mm + "/" + yyyy, docName, term.Index, ref numOfTerms, "Date");
+							addTermToDic(d_abNumTerms, dd + "/" + mm + "/" + yyyy, docName, term.Index, ref numOfTerms, "Date");
                         }
                         break;
                     case "Year":
                         convertedDate = new DateTime(int.Parse(termString), 1, 1);
                         termString = convertedDate.ToShortDateString();
-                        addTermToDic(d_DateTerms, termString, docName, term.Index, ref numOfTerms, "Date");
+						addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, "Date");
                         break;
 
                     default:
                         //stemmer
                         if (use_stem)
                             termString = stemmer.stemTerm(termString);
-                        addTermToDic(d_WordTerms, termString, docName, term.Index, ref numOfTerms, type);
+						//insert to correct dictionary
+						if (termString[0] >= 's')
+							addTermToDic(d_szTerms, termString, docName, term.Index, ref numOfTerms, type);
+						else if (termString[0] >= 'n')
+							addTermToDic(d_nrTerms, termString, docName, term.Index, ref numOfTerms, type);
+						else if (termString[0] >= 'g')
+							addTermToDic(d_gmTerms, termString, docName, term.Index, ref numOfTerms, type);
+						else if (termString[0] >= 'c')
+							addTermToDic(d_cfTerms, termString, docName, term.Index, ref numOfTerms, type);
+						else
+							addTermToDic(d_abNumTerms, termString, docName, term.Index, ref numOfTerms, type);
                         break;
                 }
-
-
-
             }
 
             return numOfTerms;

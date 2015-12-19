@@ -26,21 +26,18 @@ namespace SearchEngine
         {
 
             System.Console.WriteLine("started parsing at:" + DateTime.Now);
-            File.Create("postingFile.txt");
-            string path = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus";
-            //Indexer indexer = new Indexer();
+            File.Create("abNumsPosting.txt");
+			File.Create("cfPosting.txt");
+			File.Create("gmPosting.txt");
+			File.Create("nrPosting.txt");
+			File.Create("szPosting.txt");
+			string path = @"C:\Users\Bar\Desktop\engineFiles\corpus";
+
             Parse parser = new Parse(path);
             parser.startParsing();
-            //SortedDictionary<string, Term> dict = parser.d_allTerms;
-            //System.Console.WriteLine("Finished parsing at:" + DateTime.Now);
+
             System.Console.WriteLine("finished all at:" + DateTime.Now);
             System.Console.Read();
-            /*
-            System.Console.WriteLine("started indexing at:" + DateTime.Now);
-            indexer.saveTerms(dict);
-            System.Console.WriteLine("finished indexing at:" + DateTime.Now);
-            System.Console.Read();
-            */
         }
     }
 }

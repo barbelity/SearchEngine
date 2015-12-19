@@ -9,22 +9,25 @@ namespace SearchEngine.Model
 {
     class Indexer : iIndexer
     {
+		private SortedList<string, int> mainIndexList1;
+		private SortedList<string, int> mainIndexList2;
+		private SortedList<string, int> mainIndexList3;
+		private SortedList<string, int> mainIndexList4;
+		private SortedList<string, int> mainIndexList5;
 
-        //private SortedDictionary<string, int> mainIndex;
-        private SortedList<string, int> mainIndexList;
-        //		private string lastInPosting;//keep the last term in file for quick writing
-        //		private bool writeToEnd;//this boolean determines wether to write to end of file
         StreamReader postingReader;
         StreamWriter tempWriter;
 
         public Indexer()
         {
-            //mainIndex = new SortedDictionary<string, int>();
-            mainIndexList = new SortedList<string, int>(); //- OPTIONAL to use SortedList instead of SortedDictionary for access by index, int = df
-            //			lastInPosting = null;
+			mainIndexList1 = new SortedList<string, int>();
+			mainIndexList2 = new SortedList<string, int>();
+			mainIndexList3 = new SortedList<string, int>();
+			mainIndexList4 = new SortedList<string, int>();
+			mainIndexList5 = new SortedList<string, int>();
         }
 
-        public void saveTerms(SortedDictionary<string, Term> terms, Dictionary<string, Doc> docs)
+        public void saveTerms(SortedDictionary<string, Term> terms, string fileName, SortedList<string, int> mainIndexList)
         {
             int lineCount = 0;//on what line in posting i stand
             int writeLineNumber;//the line number i need to write
@@ -33,11 +36,8 @@ namespace SearchEngine.Model
             string currLine = "";
 
             //statistics
-            string currDoc = "";
             int currDf;
-            //lastInPosting = null;
-            //			writeToEnd = false;
-            postingReader = new StreamReader("postingFile.txt");
+            postingReader = new StreamReader(fileName);
             if (!File.Exists("tempFile.txt"))
                 tempWriter = File.CreateText("tempFile.txt");
             else
@@ -46,26 +46,13 @@ namespace SearchEngine.Model
             foreach (KeyValuePair<string, Term> tuple in terms)
             {
                 currTerm = tuple.Key;
-                //currDoc = tuple.Value.d_locations
-                //docs[]
                 currDf = tuple.Value.d_locations.Count;
-
-
-                /*
-                                if (writeToEnd)
-                                {
-                                    tempWriter.WriteLine(currTerm + " " + tuple.Value.ToString());
-                                    continue;
-                                }
-                */
-                //if (mainIndex.ContainsKey(currTerm))
                 if (mainIndexList.ContainsKey(currTerm))
                 {
                     //update number of files df
                     mainIndexList[currTerm] += currDf;
                     //get term's index
-                    //writeLineNumber = mainIndex[currTerm];
-                    writeLineNumber = mainIndexList[currTerm];
+					writeLineNumber = mainIndexList.IndexOfKey(currTerm) - insertedTerms;
                     //move all the lines before to the new file
                     for (; lineCount < writeLineNumber; lineCount++)
                     {
@@ -79,22 +66,9 @@ namespace SearchEngine.Model
                     tempWriter.WriteLine(currLine);
                     //INCREASE LINE?
                     lineCount++;
-                    //go to next term
                 }
                 else
                 {
-                    //checks if the term is after the last term in file
-                    /*
-                                        if (currTerm.CompareTo(lastInPosting) > 0)
-                                        {
-                                            //write to end of file
-                                            tempWriter.WriteLine(currTerm + " " + tuple.Value.ToString());
-                                            writeToEnd = true;
-
-                                        }
-                                        else
-                                        {
-                    */
                     //update number of files df
                     mainIndexList[currTerm] = currDf;
                     writeLineNumber = mainIndexList.IndexOfKey(currTerm);
@@ -104,38 +78,34 @@ namespace SearchEngine.Model
                         tempWriter.WriteLine(postingReader.ReadLine());
                     }
                     //write the new term line
-                    tempWriter.WriteLine(currTerm + " " + tuple.Value.ToString());
-                    //INCREASE LINE?
+                    tempWriter.WriteLine(currTerm + "@" + tuple.Value.ToString());
                     insertedTerms++;
-                    //go to next term
-                    //					}
-
                 }
             }
-            //DONT FORGET to complete writing rest of lines from posting to temp
+            //complete writing rest of lines from posting to temp
             while (!postingReader.EndOfStream)
             {
                 tempWriter.WriteLine(postingReader.ReadLine());
             }
-            //close streams
+
             postingReader.Close();
             tempWriter.Close();
-            //switch between file names
-            File.Move("postingFile.txt", "postingFile.old");
-            File.Move("tempFile.txt", "postingFile.txt");
-            File.Delete("postingFile.old");
+
+            File.Move(fileName, fileName + ".old");
+			File.Move("tempFile.txt", fileName);
+			File.Delete(fileName + ".old");
         }
 
 
-        public void startIndexing()
+        public void startIndexing(SortedDictionary<string, Term> d_abNums, SortedDictionary<string, Term> d_cf, SortedDictionary<string, Term> d_gm, SortedDictionary<string, Term> d_nr, SortedDictionary<string, Term> d_sz)
         {
-            throw new NotImplementedException();
-        }
-
-
-        public void saveTerms(SortedDictionary<string, Term> d_DateTerms, SortedDictionary<string, Term> d_WordTerms, SortedDictionary<string, Term> d_PercentallTerms, SortedDictionary<string, Term> d_PriceTerms, SortedDictionary<string, Term> d_NumberTerms, Dictionary<string, Doc> docs)
-        {
-            throw new NotImplementedException();
+			System.Console.WriteLine("started indexing at:" + DateTime.Now);
+			saveTerms(d_abNums, "abNumsPosting.txt", mainIndexList1);
+			saveTerms(d_cf, "cfPosting.txt", mainIndexList2);
+			saveTerms(d_gm, "gmPosting.txt", mainIndexList3);
+			saveTerms(d_nr, "nrPosting.txt", mainIndexList4);
+			saveTerms(d_sz, "szPosting.txt", mainIndexList5);
+			System.Console.WriteLine("finished indexing at:" + DateTime.Now);
         }
     }
 }

@@ -142,38 +142,13 @@ namespace SearchEngine
 
         private void btn_displayPosting_Click(object sender, RoutedEventArgs e)
         {
-            if (txtbx_postingPath.Text.Length != 0)
+ 
+
+            if (indexer != null)
             {
-                if (!Directory.Exists(txtbx_postingPath.Text))
-                {
-                    MessageBox.Show("Please enter a valid Posting Files path");
-                    return;
-                }
-                postingPath = txtbx_postingPath.Text;
-            }
-            else
-            {
-                MessageBox.Show("Please enter Posting Files path");
-                return;
+                txtbx_postingDisplay.Text = indexer.getPostingString();
             }
 
-            try
-            {
-                string posting = File.ReadAllText(postingPath + @"\abNumsPosting.txt");
-                posting = File.ReadAllText(postingPath + @"\cfPosting.txt");
-                posting = File.ReadAllText(postingPath + @"\gmPosting.txt");
-                posting = File.ReadAllText(postingPath + @"\nrPosting.txt");
-                posting = File.ReadAllText(postingPath + @"\szPosting.txt");
-
-
-                txtbx_postingDisplay.Text = posting;
-            }
-            catch (Exception)
-            {
-
-                MessageBox.Show("Posting Files in path not found");
-                return;
-            }
 
         }
 

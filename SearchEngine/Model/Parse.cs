@@ -11,6 +11,7 @@ namespace SearchEngine.Model
 {
     class Parse : iParse
     {
+        // used for events
         public delegate void ModelFunc(int type, string value);
         public event ModelFunc ModelChanged;
 
@@ -54,10 +55,17 @@ namespace SearchEngine.Model
         static Regex justMonthReg = new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)", RegexOptions.IgnoreCase);
 
         static Regex justANumberReg = new Regex(@"\d+");
+        static Regex NumberReg = new Regex(@"\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?");
 
         #endregion
 
         static iIndexer _indexer;
+        /// <summary>
+        /// constractor
+        /// </summary>
+        /// <param name="Path">path to data files</param>
+        /// <param name="indexer">instanc of indexer</param>
+        /// <param name="stemming">yes/no stemming</param>
         public Parse(string Path, iIndexer indexer, bool stemming)
         {
             use_stem = stemming;
@@ -69,6 +77,9 @@ namespace SearchEngine.Model
 
         Thread[] a_Threads = new Thread[15];
         Thread t_indexer = null;
+        /// <summary>
+        /// main func for parsing
+        /// </summary>
         public void startParsing()
         {
 
@@ -148,11 +159,18 @@ namespace SearchEngine.Model
 
         }
 
+        /// <summary>
+        /// calls indexing used in a new thread
+        /// </summary>
         static void startIndexing()
         {
             _indexer.startIndexing(ref d_terms);
         }
 
+        /// <summary>
+        /// threaded parsing, run on a singel file, split docs and save to dic
+        /// </summary>
+        /// <param name="o_filePath">file path</param>
         public static void ThreadParsing(object o_filePath)
         {
             string filePath = (string)o_filePath;
@@ -168,13 +186,14 @@ namespace SearchEngine.Model
             }
         }
 
-
-
+        /// <summary>
+        /// parse a singel doc for ThreadParsing
+        /// </summary>
+        /// <param name="docRaw"></param>
         static public void parseDoc(string docRaw)
         {
 
             //get name
-
             string[] split = docRaw.Split(new string[] { "<DOCNO>" }, StringSplitOptions.None);
             split = split[1].Split(new string[] { "</DOCNO>" }, StringSplitOptions.None);
             string docName = split[0].Trim(charsToTrim);
@@ -208,12 +227,24 @@ namespace SearchEngine.Model
             numOfTerms += getTerms(ref text, priceReg, "Price", docName);
             numOfTerms += getTerms(ref text, numReg, "Number", docName);
             numOfTerms += getTerms(ref text, namesReg, "Name", docName);
+            //numOfTerms += getTerms(ref text, quoteRegex, "Quote", docName);
+            //numOfTerms += getTerms(ref text, capsRegex, "CapsHeadline", docName);
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
             //update numOfTerms - if we put it in constructor of doc it saves time
             doc.termsCount = numOfTerms;
             doc.d_TermsCount = null;
         }
 
+
+        /// <summary>
+        /// adds a term to dictionary
+        /// </summary>
+        /// <param name="d_terms">dictionary to add to</param>
+        /// <param name="term">term string to add</param>
+        /// <param name="docName">docName</param>
+        /// <param name="index">index of term</param>
+        /// <param name="numOfTerms">numOfTerms in doc</param>
+        /// <param name="type">term type</param>
         static private void addTermToDic(SortedDictionary<string, Term> d_terms, string term, string docName, int index, ref int numOfTerms, string type)
         {
             lock (d_terms)
@@ -245,6 +276,15 @@ namespace SearchEngine.Model
             }
         }
 
+
+        /// <summary>
+        /// find and saves terms by regex
+        /// </summary>
+        /// <param name="text">text of doc</param>
+        /// <param name="regex">regex to use</param>
+        /// <param name="type">type of terms it finds</param>
+        /// <param name="docName">the doc to search in</param>
+        /// <returns></returns>
         static private int getTerms(ref string text, Regex regex, string type, string docName)
         {
             MatchCollection terms = regex.Matches(text);
@@ -303,6 +343,22 @@ namespace SearchEngine.Model
                         }
                         addTermToDic(d_abNumTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
                         break;
+                        /*
+                    case "Number":
+                        MatchCollection num = NumberReg.Matches(termString);
+                        float numformated;
+                        float.TryParse(num[0].ToString(), out numformated);
+                        if (termString.Contains('m'))
+                        {
+                            numformated = numformated * 1000000;
+                        }
+                        else if (termString.Contains('n'))
+                        {
+                            numformated = numformated * 1000000000;
+                        }
+                        addTermToDic(d_abNumTerms, , docName, term.Index, ref numOfTerms, "Number");
+                        break;
+                        */
                     case "Date":
                         try
                         {
@@ -395,6 +451,10 @@ namespace SearchEngine.Model
             return numOfTerms;
         }
 
+
+        /// <summary>
+        /// uses to fill months dic for forrmating dates
+        /// </summary>
         private void addMonths()
         {
             months.Add("january", "01");
@@ -423,139 +483,7 @@ namespace SearchEngine.Model
 
         }
 
-        /*
-private string fixDate(string termString)
-{
-    string dd, mm, yyyy;
-    MatchCollection matches = justMonthReg.Matches(termString);
-
-    if (matches.Count != 0)
-    {
-        mm = months[matches[0].ToString().ToLower()];
-        matches = numReg.Matches(termString);
-
-        dd = matches[0].ToString();
-        if (dd.Length < 2) dd = "0" + dd;
-
-        if (matches.Count < 2)
-        {
-            yyyy = "xxxx";
-        }
-        else
-        {
-            yyyy = matches[1].ToString();
-            if (yyyy.Length == 2)
-            {
-                yyyy = "19" + yyyy;
-            }
-        }
-    }
-    else
-    {
-        mm = "xx";
-        dd = "xx";
-        yyyy = termString;
-
-    }
-
-    return dd + "/" + mm + "/" + yyyy;
-}
-*/
-
-        /*
-        /// <summary>
-        /// gets term dates
-        /// </summary>
-        /// <param name="text">docText</param>
-        /// <param name="d_terms">term dictionary</param>
-        /// <param name="docName">document name</param>
-        /// <returns></returns>
-        private int getDatesTerms(ref string text, ref Dictionary<string, Term> d_terms, string name)
-        {
-
-            string dd, mm, yyyy;
-            int numOfTerms = 0;
-            // dates are in order like "15th may 1999"
-            MatchCollection terms = datesInOrderRegex.Matches(text);
-            foreach (Match term in terms)
-            {
-                string termString = term.ToString().ToLower().Replace('\n', ' ').Trim(charsToTrim);
-                string[] termStringSplited = termString.Split(' ');
-                dd = termStringSplited[0];
-                if (dd.Length == 1)
-                {
-                    dd = "0" + dd;
-                }
-                mm = months[termStringSplited[1].ToLower()];
-                if (termStringSplited.Length == 3)
-                {
-                    yyyy = termStringSplited[2];
-                }
-                else
-                {
-                    yyyy = "xxxx";
-                }
-                addTermToDic(dd + "/" + mm + "/" + yyyy, ref d_terms, name, term.Index, ref numOfTerms, "Date");
-                //clear term
-                string clearTerm = new String('*', term.Length);
-                text = text.Substring(0, term.Index) + clearTerm + text.Substring(term.Index + term.Length);
-            }
-            // month is first like "may 1, 1999"
-            terms = datesMonthFirstRegex.Matches(text);
-            foreach (Match term in terms)
-            {
-                string termString = term.ToString().ToLower().Replace('\n', ' ').Trim(charsToTrim);
-                string[] termStringSplited = termString.Split(' ', ',');
-                mm = months[termStringSplited[0].ToLower()];
-
-                if (termStringSplited[1].Length > 2)
-                {
-                    yyyy = termStringSplited[1];
-                    dd = "xx";
-                }
-                else
-                {
-                    dd = termStringSplited[1];
-                    if (dd.Length == 1)
-                    {
-                        dd = "0" + dd;
-                    }
-                    if (termStringSplited.Length == 4)
-                    {
-                        yyyy = termStringSplited[3];
-                    }
-                    else
-                    {
-                        yyyy = "xxxx";
-                    }
-
-                }
-
-                addTermToDic(dd + "/" + mm + "/" + yyyy, ref d_terms, name, term.Index, ref numOfTerms, "Date");
-                //clear term
-                string clearTerm = new String('*', term.Length);
-                text = text.Substring(0, term.Index) + clearTerm + text.Substring(term.Index + term.Length);
-            }
-
-            // just years
-            terms = yearsRegex.Matches(text);
-            foreach (Match term in terms)
-            {
-                string termString = term.ToString().ToLower().Replace('\n', ' ');
-                string[] termStringSplited = termString.Split(' ');
-                yyyy = termStringSplited[1];
-                dd = "xx";
-                mm = "xx";
-
-                addTermToDic(dd + "/" + mm + "/" + yyyy, ref d_terms, name, term.Index, ref numOfTerms, "Date");
-                //clear term
-                string clearTerm = new String('*', term.Length);
-                text = text.Substring(0, term.Index) + clearTerm + text.Substring(term.Index + term.Length);
-
-            }
-            return numOfTerms;
-        }
-        */
+   
 
     }
 }

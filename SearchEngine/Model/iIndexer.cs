@@ -10,5 +10,6 @@ namespace SearchEngine.Model
     {
 		void startIndexing(ref SortedDictionary<string, Term>[] d_terms);
         void saveLists();
+        string getPostingString();
     }
 }

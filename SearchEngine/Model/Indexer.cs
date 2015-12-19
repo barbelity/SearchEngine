@@ -153,5 +153,30 @@ namespace SearchEngine.Model
             formatter.Serialize(new FileStream(postingPath + @"\list4.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList4);
             formatter.Serialize(new FileStream(postingPath + @"\list5.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList5);
         }
+
+        public string getPostingString()
+        {
+
+            StringBuilder ans = new StringBuilder();
+
+            ans.Append(ListToString(mainIndexList1));
+            ans.Append(ListToString(mainIndexList2));
+            ans.Append(ListToString(mainIndexList3));
+            ans.Append(ListToString(mainIndexList4));
+            ans.Append(ListToString(mainIndexList5));
+
+            return ans.ToString();
+
+        }
+
+        private StringBuilder ListToString(SortedList<string, int> mainIndexList)
+        {
+            StringBuilder ans = new StringBuilder();
+            foreach (var item in mainIndexList)
+            {
+                ans.Append(item.Key + ": " + item.Value.ToString()+"\n");
+            }
+            return ans;
+        }
     }
 }

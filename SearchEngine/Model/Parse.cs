@@ -11,120 +11,184 @@ namespace SearchEngine.Model
 {
     class Parse : iParse
     {
-        Dictionary<string, string> months = new Dictionary<string, string>();
-        private Dictionary<string, bool> StopWords;
+        static Dictionary<string, string> months = new Dictionary<string, string>();
+        static private Dictionary<string, bool> StopWords;
         //Mutex mStopwords = new Mutex();
-        private string filesPath;
-        StemmerInterface stemmer = new Stemmer();
-        public SortedDictionary<string, Term> d_abNumTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_cfTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_gmTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_nrTerms = new SortedDictionary<string, Term>();
-        public SortedDictionary<string, Term> d_szTerms = new SortedDictionary<string, Term>();
-        public Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
-        public Dictionary<string, int> d_currentDocTerms;
-        bool use_stem = false;
+        static private string filesPath;
+        static StemmerInterface stemmer = new Stemmer();
+        static SortedDictionary<string, Term>[] d_terms = new SortedDictionary<string, Term>[5];
+        public static SortedDictionary<string, Term> d_abNumTerms = new SortedDictionary<string, Term>();
+        public static SortedDictionary<string, Term> d_cfTerms = new SortedDictionary<string, Term>();
+        public static SortedDictionary<string, Term> d_gmTerms = new SortedDictionary<string, Term>();
+        public static SortedDictionary<string, Term> d_nrTerms = new SortedDictionary<string, Term>();
+        public static SortedDictionary<string, Term> d_szTerms = new SortedDictionary<string, Term>();
+        public static Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
+        
 
-        private char[] charsToTrim = { ',', '.', ' ', ';', ':', '~', '|', '\n' };
+        static bool use_stem = false;
+
+        static private char[] charsToTrim = { ',', '.', ' ', ';', ':', '~', '|', '\n' };
         #region Regex's
         //regexs
-        Regex numReg = new Regex(@"\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\s(million|trillion|billion|hundreds))?");
-        Regex rangeReg = new Regex(@"\s(between\s)?\d+(\-|\sand\s)\d+", RegexOptions.IgnoreCase);
-        Regex percentReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\%|\s(percent|percents|percentage))");
-        Regex priceReg = new Regex(@"\s(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(m|bn|\smillion|\sbillion)?");
-        Regex namesReg = new Regex(@"\s([A-Z][a-z]{1,}\s)+");
-        Regex wordRegex = new Regex(@"[a-zA-Z]+");
+        static Regex numReg = new Regex(@"\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\s(million|trillion|billion|hundreds))?");
+        static Regex rangeReg = new Regex(@"\s(between\s)?\d+(\-|\sand\s)\d+", RegexOptions.IgnoreCase);
+        static Regex percentReg = new Regex(@"\s\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(\%|\s(percent|percents|percentage))");
+        static Regex priceReg = new Regex(@"\s(Dollars\s|\$)\d+(,\d{3})*(\.\d+)?(\s\d+\/\d+)?(m|bn|\smillion|\sbillion)?");
+        static Regex namesReg = new Regex(@"\s([A-Z][a-z]{1,}\s)+");
+        static Regex wordRegex = new Regex(@"[a-zA-Z]+");
 
         //Regex datesRegex = new Regex(@"([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)(\s\d{1,4})?(,\s\d{1,4})?)|\s\d{4})\s", RegexOptions.IgnoreCase);
         //Regex datesRegex = new Regex(@"(\D([1-9]\d?(th)?\s)?(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)(\s\d{1,4})?(,\s\d{4})?)", RegexOptions.IgnoreCase);
 
-        Regex yearsRegex = new Regex(@"\s[1-2]\d{3}\s");
-        Regex datesInOrderRegex = new Regex(@"([1-2]\d|3[0-2]|[1-9])(th)?\s(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)(\s\d{2,4})?", RegexOptions.IgnoreCase);
-        Regex datesMonthFirstRegex = new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s(\d{1,4})(\,\s\d{4})?", RegexOptions.IgnoreCase);
+        static Regex yearsRegex = new Regex(@"\s[1-2]\d{3}\s");
+        static Regex datesInOrderRegex = new Regex(@"([1-2]\d|3[0-2]|[1-9])(th)?\s(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)(\s\d{2,4})?", RegexOptions.IgnoreCase);
+        static Regex datesMonthFirstRegex = new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)\s(\d{1,4})(\,\s\d{4})?", RegexOptions.IgnoreCase);
         //my regexs
-        Regex quoteRegex = new Regex(@"\x22(\s|\w|\d)*\x22"); // for quotes
-        Regex capsRegex = new Regex(@"[A-Z]{2,}(\s[A-Z]{2,})*"); // for initials (like "JS") or headlines ("EMPLOYERS STAY OUT OF CIP DEBATE") 
+        static Regex quoteRegex = new Regex(@"\x22(\s|\w|\d)*\x22"); // for quotes
+        static Regex capsRegex = new Regex(@"[A-Z]{2,}(\s[A-Z]{2,})*"); // for initials (like "JS") or headlines ("EMPLOYERS STAY OUT OF CIP DEBATE") 
 
         //for date fix
-        Regex justMonthReg = new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)", RegexOptions.IgnoreCase);
+        static Regex justMonthReg = new Regex(@"(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|june?|july?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)", RegexOptions.IgnoreCase);
 
-        Regex justANumberReg = new Regex(@"\d+");
+        static Regex justANumberReg = new Regex(@"\d+");
 
         #endregion
 
-        iIndexer indexer;
-        public Parse(string filesPath, iIndexer indexer)
+        static iIndexer _indexer;
+        public Parse(string Path, iIndexer indexer)
         {
-            this.filesPath = filesPath;
-            this.indexer = indexer;
-            StopWords = ReadFile.readStopWords(filesPath + @"\stop_words.txt");
+            filesPath = Path;
+            _indexer = indexer;
+            StopWords = ReadFile.readStopWords(Path + @"\stop_words.txt");
             addMonths();
         }
 
-
+        Thread[] a_Threads = new Thread[15];
+        Thread t_indexer = null;
         public void startParsing()
         {
-            
-            int docsCount = 0;
+
             string[] paths = ReadFile.getFilesPaths(filesPath);
+            int i=0,j = 0;
             foreach (string filePath in paths)
             {
-                if(System.IO.Path.GetFileName(filePath)== "stop_words.txt") continue;
-                string[] docs = ReadFile.fileToDocString(filePath);
-                foreach (string doc in docs)
+                a_Threads[i] = new Thread(new ParameterizedThreadStart(ThreadParsing));
+                a_Threads[i].Start(filePath);
+
+                if (++i == 15)
                 {
-                    if (doc.Length > 3)
+                    j += i;
+                    i = 0;
+                    foreach (Thread t in a_Threads)
                     {
-                        parseDoc(doc);
-                        docsCount++;
-                        if (docsCount == 4000)
-                        {
-                            indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
-                            d_abNumTerms = new SortedDictionary<string, Term>();
-                            d_cfTerms = new SortedDictionary<string, Term>();
-                            d_gmTerms = new SortedDictionary<string, Term>();
-                            d_nrTerms = new SortedDictionary<string, Term>();
-                            d_szTerms = new SortedDictionary<string, Term>();
-                            docsCount = 0;
-                        }
+                        t.Join();
                     }
+
+                    if (j == 60)
+                    {
+                        j = 0;
+                        if (!(t_indexer == null))
+                        {
+                            t_indexer.Join();
+                        }
+
+                        d_terms[0] = d_abNumTerms;
+                        d_terms[1] = d_cfTerms;
+                        d_terms[2] = d_gmTerms;
+                        d_terms[3] = d_nrTerms;
+                        d_terms[4] = d_szTerms;
+                        t_indexer = new Thread(new ThreadStart(startIndexing));
+                        t_indexer.Start();
+                        d_abNumTerms = new SortedDictionary<string, Term>();
+                        d_cfTerms = new SortedDictionary<string, Term>();
+                        d_gmTerms = new SortedDictionary<string, Term>();
+                        d_nrTerms = new SortedDictionary<string, Term>();
+                        d_szTerms = new SortedDictionary<string, Term>();
+                    }
+                    
                 }
+
+
+
             }
-            //saving the remainder of terms
-            indexer.startIndexing(d_abNumTerms, d_cfTerms, d_gmTerms, d_nrTerms, d_szTerms);
+            foreach (Thread t in a_Threads)
+            {
+                t.Join();
+            }
+            if (!(t_indexer == null))
+            {
+                t_indexer.Join();
+            }
+            d_terms[0] = d_abNumTerms;
+            d_terms[1] = d_cfTerms;
+            d_terms[2] = d_gmTerms;
+            d_terms[3] = d_nrTerms;
+            d_terms[4] = d_szTerms;
+            t_indexer = new Thread(new ThreadStart(startIndexing));
+            t_indexer.Start();
+            t_indexer.Join();
+            for (i = 0; i < 5; i++)
+            {
+                d_terms[i] = null;
+            }
             d_abNumTerms = null;
             d_cfTerms = null;
             d_gmTerms = null;
             d_nrTerms = null;
             d_szTerms = null;
-            docsCount = 0;
             System.Console.WriteLine("finished all at:" + DateTime.Now);
-            int i = 1;
+
+        }
+
+        static void startIndexing()
+        {
+            _indexer.startIndexing(ref d_terms);
+        }
+
+        public static void ThreadParsing(object o_filePath)
+        {
+            string filePath = (string)o_filePath;
+            //if(System.IO.Path.GetFileName(filePath)== "stop_words.txt") continue;
+            string[] docs = ReadFile.fileToDocString(filePath);
+            foreach (string doc in docs)
+            {
+                if (doc.Length > 3)
+                {
+                    parseDoc(doc);
+
+                }
+            }
         }
 
 
-        public void parseDoc(string docRaw)
+
+        static public void parseDoc(string docRaw)
         {
-            d_currentDocTerms = new Dictionary<string, int>();
+
             //get name
+            
             string[] split = docRaw.Split(new string[] { "<DOCNO>" }, StringSplitOptions.None);
             split = split[1].Split(new string[] { "</DOCNO>" }, StringSplitOptions.None);
             string docName = split[0].Trim(charsToTrim);
-
+            Doc doc;
             //get text + date
             split = split[1].Split(new string[] { "<TEXT>" }, StringSplitOptions.None);
             int dateStartIdx = split[0].IndexOf("<DATE1>");
             if (dateStartIdx > 0)
             {
                 string date = split[0].Substring(dateStartIdx + 7, split[0].IndexOf("</DATE1>") - dateStartIdx - 7);
-                d_docs[docName] = new Doc(docName, date.Trim(charsToTrim));
+                doc = new Doc(docName, date.Trim(charsToTrim));
             }
             else
-                d_docs[docName] = new Doc(docName);
+                doc = new Doc(docName);
 
             split = split[1].Split(new string[] { "</TEXT>" }, StringSplitOptions.None);
             string text = split[0];
 
+            doc.d_TermsCount = new Dictionary<string, int>();
+            lock (d_docs) { 
+            d_docs[docName] = doc;
+            }
             //get terms from text
             int numOfTerms = 0;//stores the number of terms in doc
             numOfTerms += getTerms(ref text, datesInOrderRegex, "Date", docName);
@@ -140,34 +204,38 @@ namespace SearchEngine.Model
             d_docs[docName].termsCount = numOfTerms;
         }
 
-        private void addTermToDic(SortedDictionary<string, Term> d_terms, string term, string docName, int index, ref int numOfTerms, string type)
+        static private void addTermToDic(SortedDictionary<string, Term> d_terms, string term, string docName, int index, ref int numOfTerms, string type)
         {
-            if (!d_terms.ContainsKey(term))
+            lock (d_terms)
             {
-                d_terms[term] = new Term(type, term);
-                numOfTerms++;
+                if (!d_terms.ContainsKey(term))
+                {
+                    d_terms[term] = new Term(type, term);
+                    numOfTerms++;
+                }
+                d_terms[term].addPosition(docName, index);
             }
-            d_terms[term].addPosition(docName, index);
             int tfDoc;
             // change max tf in doc if needed
-            if (d_currentDocTerms.ContainsKey(term))
+            Doc doc = d_docs[docName];
+            if (doc.d_TermsCount.ContainsKey(term))
             {
-                tfDoc = ++d_currentDocTerms[term];
+                tfDoc = ++doc.d_TermsCount[term];
             }
             else
             {
-                d_currentDocTerms[term] = 1;
+                doc.d_TermsCount[term] = 1;
                 tfDoc = 1;
             }
 
-            if (d_docs[docName].maxtfCount < tfDoc)
+            if (doc.maxtfCount < tfDoc)
             {
-                d_docs[docName].maxtfString = term;
-                d_docs[docName].maxtfCount = tfDoc;
+                doc.maxtfString = term;
+                doc.maxtfCount = tfDoc;
             }
         }
 
-        private int getTerms(ref string text, Regex regex, string type, string docName)
+        static private int getTerms(ref string text, Regex regex, string type, string docName)
         {
             MatchCollection terms = regex.Matches(text);
             int numOfTerms = 0;
@@ -179,7 +247,7 @@ namespace SearchEngine.Model
                 if (StopWords.ContainsKey(termString) || termString.Length <= 2)
                     continue;
 
-                if (!(type == "Word") && !(type == "Number"))
+                 if (!(type == "Word") && !(type == "Number"))
                 {
                     string clearTerm = new String('#', term.Length - 2);
                     text = text.Substring(0, term.Index) + " " + clearTerm + " " + text.Substring(term.Index + term.Length);

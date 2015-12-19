@@ -124,15 +124,20 @@ namespace SearchEngine.Model
         }
 
 
-        public void startIndexing(SortedDictionary<string, Term> d_abNums, SortedDictionary<string, Term> d_cf, SortedDictionary<string, Term> d_gm, SortedDictionary<string, Term> d_nr, SortedDictionary<string, Term> d_sz)
+        public void startIndexing(ref SortedDictionary<string, Term>[] d_terms)
         {
 			System.Console.WriteLine("started indexing at:" + DateTime.Now);
-			saveTerms(d_abNums, "abNumsPosting.txt", mainIndexList1);
-			saveTerms(d_cf, "cfPosting.txt", mainIndexList2);
-			saveTerms(d_gm, "gmPosting.txt", mainIndexList3);
-			saveTerms(d_nr, "nrPosting.txt", mainIndexList4);
-			saveTerms(d_sz, "szPosting.txt", mainIndexList5);
-			System.Console.WriteLine("finished indexing at:" + DateTime.Now);
+			saveTerms(d_terms[0], "abNumsPosting.txt", mainIndexList1);
+            d_terms[0] = null;
+            saveTerms(d_terms[1], "cfPosting.txt", mainIndexList2);
+            d_terms[1] = null;
+            saveTerms(d_terms[2], "gmPosting.txt", mainIndexList3);
+            d_terms[2] = null;
+            saveTerms(d_terms[3], "nrPosting.txt", mainIndexList4);
+            d_terms[3] = null;
+            saveTerms(d_terms[4], "szPosting.txt", mainIndexList5);
+            d_terms[4] = null;
+            System.Console.WriteLine("finished indexing at:" + DateTime.Now);
         }
 
         public void saveLists()

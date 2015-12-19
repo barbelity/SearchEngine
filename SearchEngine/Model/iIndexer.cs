@@ -8,6 +8,6 @@ namespace SearchEngine.Model
 {
     interface iIndexer
     {
-		void startIndexing(SortedDictionary<string, Term> d_DateTerms, SortedDictionary<string, Term> d_WordTerms, SortedDictionary<string, Term> d_PercentallTerms, SortedDictionary<string, Term> d_PriceTerms, SortedDictionary<string, Term> d_NumberTerms);
+		void startIndexing(ref SortedDictionary<string, Term>[] d_terms);
     }
 }

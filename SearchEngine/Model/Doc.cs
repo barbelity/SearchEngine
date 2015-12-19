@@ -9,7 +9,7 @@ namespace SearchEngine.Model
     class Doc
     {
 
-
+        public Dictionary<string, int> d_TermsCount;
         public string maxtfString { get; set; }
         public int maxtfCount { get; set; }
         public string docName { get; set; }

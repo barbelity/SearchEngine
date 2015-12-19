@@ -26,13 +26,34 @@ namespace SearchEngine
     {
         iIndexer indexer;
         Parse parser;
-        string filesPath,postingPath;
+        string filesPath, postingPath;
         public MainWindow()
         {
+            postingPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\posting";
+            filesPath = @"E:\Users\Ziv\Documents\שנה שלישית\אחזור\corpus\corpus";
 
-            
+            try
+            {
+                File.Create(postingPath + @"\abNumsPosting.txt").Dispose();
+                File.Create(postingPath + @"\cfPosting.txt").Dispose();
+                File.Create(postingPath + @"\gmPosting.txt").Dispose();
+                File.Create(postingPath + @"\nrPosting.txt").Dispose();
+                File.Create(postingPath + @"\szPosting.txt").Dispose();
+            }
+            catch (Exception exp)
+            {
 
-            
+                return;
+            }
+
+            System.Console.WriteLine("started parsing at:" + DateTime.Now);
+            indexer = new Indexer(postingPath);
+            parser = new Parse(filesPath, indexer);
+            Thread thread = new Thread(new ThreadStart(parser.startParsing));
+            thread.Start();
+
+
+
         }
 
         private void btn_startParsing_Click(object sender, RoutedEventArgs e)
@@ -152,7 +173,7 @@ namespace SearchEngine
                 posting = File.ReadAllText(postingPath + @"\gmPosting.txt");
                 posting = File.ReadAllText(postingPath + @"\nrPosting.txt");
                 posting = File.ReadAllText(postingPath + @"\szPosting.txt");
-       
+
 
                 txtbx_postingDisplay.Text = posting;
             }
@@ -162,7 +183,7 @@ namespace SearchEngine
                 MessageBox.Show("Posting Files in path not found");
                 return;
             }
-            
+
         }
 
 
@@ -176,7 +197,7 @@ namespace SearchEngine
                     MessageBox.Show("Please enter a valid Posting Files path");
                     return;
                 }
-                
+
                 postingPath = txtbx_postingPath.Text;
             }
             else

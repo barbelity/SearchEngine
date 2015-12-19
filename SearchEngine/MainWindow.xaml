@@ -3,17 +3,7 @@
         Width="550"
         Title="MainWindow">
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem x:Name="b_save"
-                      Header="Save" Click="b_save_Click"
-                       />
-            <MenuItem x:Name="b_load"
-                      Header="Load" Click="b_load_Click"
-                       />
-            <MenuItem x:Name="b_exit"
-                Header="Exit" Click="b_exit_Click"
-                       />
-        </Menu>
+        
         <StackPanel DockPanel.Dock="Left"
                     Orientation="Vertical">
             <TextBlock DockPanel.Dock="Top"

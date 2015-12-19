@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace SearchEngine
 {
     /// <summary>
@@ -146,20 +147,6 @@ namespace SearchEngine
             
         }
 
-        private void b_exit_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void b_load_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void b_save_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
 
         private void btn_loadPosting_Click(object sender, RoutedEventArgs e)

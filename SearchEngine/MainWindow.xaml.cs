@@ -151,7 +151,20 @@ namespace SearchEngine
 
         }
 
+        private void b_dataPath_Click(object sender, RoutedEventArgs e)
+        {
+            var openFile = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = openFile.ShowDialog();
+            
+            txtbx_filesPath.Text = openFile.SelectedPath.ToString();
+        }
 
+        private void b_postingPath_Click(object sender, RoutedEventArgs e)
+        {
+            var openFile = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = openFile.ShowDialog();
+            txtbx_postingDisplay.Text = openFile.SelectedPath.ToString();
+        }
 
         private void btn_loadPosting_Click(object sender, RoutedEventArgs e)
         {

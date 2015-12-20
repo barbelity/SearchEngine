@@ -3,7 +3,16 @@
         Width="550"
         Title="SearchEngine">
     <DockPanel>
-        
+        <Menu DockPanel.Dock="Top">
+            <MenuItem x:Name="b_dataPath"
+                      Header="Select Data path" Click="b_dataPath_Click"
+                      />
+            <MenuItem x:Name="b_postingPath"
+                      Header="Select Posting path"
+                      Margin="3" Click="b_postingPath_Click"/>
+
+
+        </Menu>
         <StackPanel DockPanel.Dock="Left"
                     Orientation="Vertical">
             <TextBlock DockPanel.Dock="Top"

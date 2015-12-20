@@ -222,6 +222,7 @@ namespace SearchEngine.Model
             {
                 d_docs[docName] = doc;
             }
+            
             //get terms from text
             int numOfTerms = 0;//stores the number of terms in doc
             numOfTerms += getTerms(ref text, datesInOrderRegex, "Date", docName);
@@ -232,8 +233,8 @@ namespace SearchEngine.Model
             numOfTerms += getTerms(ref text, priceReg, "Price", docName);
             numOfTerms += getTerms(ref text, numReg, "Number", docName);
             numOfTerms += getTerms(ref text, namesReg, "Name", docName);
-            //numOfTerms += getTerms(ref text, quoteRegex, "Quote", docName);
-            //numOfTerms += getTerms(ref text, capsRegex, "CapsHeadline", docName);
+            numOfTerms += getTerms(ref text, quoteRegex, "Quote", docName);
+            numOfTerms += getTerms(ref text, capsRegex, "CapsHeadline", docName);
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
             //update numOfTerms - if we put it in constructor of doc it saves time
             doc.termsCount = numOfTerms;
@@ -294,15 +295,16 @@ namespace SearchEngine.Model
         {
             MatchCollection terms = regex.Matches(text);
             int numOfTerms = 0;
+            string termString;
             foreach (Match term in terms)
             {
-                string termString = term.ToString().ToLower().Replace('\n', ' ').Trim(charsToTrim);
+                termString = term.ToString().ToLower().Replace('\n', ' ').Trim(charsToTrim);
 
                 // Stop words
                 if (StopWords.ContainsKey(termString) || termString.Length <= 2)
                     continue;
 
-                if (!(type == "Word") && !(type == "Number"))
+                if (!(type[0] == 'W') && !(type[0] == 'N') && !(type[0] == 'Q') && !(type[0] == 'C'))
                 {
                     string clearTerm = new String('#', term.Length - 2);
                     text = text.Substring(0, term.Index) + " " + clearTerm + " " + text.Substring(term.Index + term.Length);
@@ -348,22 +350,34 @@ namespace SearchEngine.Model
                         }
                         addTermToDic(d_abNumTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
                         break;
-                        /*
+                        
                     case "Number":
-                        MatchCollection num = NumberReg.Matches(termString);
-                        float numformated;
-                        float.TryParse(num[0].ToString(), out numformated);
-                        if (termString.Contains('m'))
+                        string[] termSplit = termString.Split(' ');
+                        Double numformated;
+                        Double.TryParse(termSplit[0].ToString(), out numformated);
+                        if (termSplit.Length > 1)
                         {
-                            numformated = numformated * 1000000;
+                            if (termSplit[1][0] == 'm')
+                            {
+                                numformated = numformated * 1000000;
+                            }
+                            else if (termSplit[1][0] == 'b')
+                            {
+                                numformated = numformated * 1000000000;
+                            }
+                            else if (termSplit[1][0] == 't')
+                            {
+                                numformated = numformated * 1000000000000;
+                            }
+                            else if (termSplit[1][0] == 'h')
+                            {
+                                numformated = numformated * 100;
+                            }
                         }
-                        else if (termString.Contains('n'))
-                        {
-                            numformated = numformated * 1000000000;
-                        }
-                        addTermToDic(d_abNumTerms, , docName, term.Index, ref numOfTerms, "Number");
+                        
+                        addTermToDic(d_abNumTerms, numformated.ToString() , docName, term.Index, ref numOfTerms, "Number");
                         break;
-                        */
+                        
                     case "Date":
                         try
                         {

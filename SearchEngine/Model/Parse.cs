@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -59,14 +62,14 @@ namespace SearchEngine.Model
 
         #endregion
 
-        static iIndexer _indexer;
+        static Indexer _indexer;
         /// <summary>
         /// constractor
         /// </summary>
         /// <param name="Path">path to data files</param>
         /// <param name="indexer">instanc of indexer</param>
         /// <param name="stemming">yes/no stemming</param>
-        public Parse(string Path, iIndexer indexer, bool stemming)
+        public Parse(string Path, Indexer indexer, bool stemming)
         {
             use_stem = stemming;
             filesPath = Path;
@@ -75,7 +78,8 @@ namespace SearchEngine.Model
             addMonths();
         }
 
-        Thread[] a_Threads = new Thread[15];
+
+        Thread[] a_Threads = new Thread[8];
         Thread t_indexer = null;
         /// <summary>
         /// main func for parsing
@@ -91,7 +95,7 @@ namespace SearchEngine.Model
                 a_Threads[i] = new Thread(new ParameterizedThreadStart(ThreadParsing));
                 a_Threads[i].Start(filePath);
 
-                if (++i == 15)
+                if (++i == 8)
                 {
                     j += i;
                     i = 0;
@@ -100,7 +104,7 @@ namespace SearchEngine.Model
                         t.Join();
                     }
                     //every 60 files start indexing
-                    if (j == 60)
+                    if (j == 40)
                     {
                         j = 0;
                         if (!(t_indexer == null))
@@ -129,7 +133,8 @@ namespace SearchEngine.Model
             }
             foreach (Thread t in a_Threads)
             {
-                t.Join();
+				if (t != null)
+					t.Join();
             }
             if (!(t_indexer == null))
             {
@@ -154,8 +159,8 @@ namespace SearchEngine.Model
             d_szTerms = null;
             //save all list data for import
             _indexer.saveLists();
-            ModelChanged(1, "Finshed parsing and indexing docs");
-            System.Console.WriteLine("finished all at:" + DateTime.Now);
+			System.Console.WriteLine("finished all at:" + DateTime.Now);
+			ModelChanged(1, "Finshed parsing and indexing docs");
 
         }
 
@@ -450,7 +455,6 @@ namespace SearchEngine.Model
 
             return numOfTerms;
         }
-
 
         /// <summary>
         /// uses to fill months dic for forrmating dates

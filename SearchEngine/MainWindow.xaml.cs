@@ -24,7 +24,7 @@ namespace SearchEngine
     /// </summary>
     public partial class MainWindow : Window
     {
-        iIndexer indexer;
+        Indexer indexer;
         Parse parser;
         string filesPath, postingPath;
         public MainWindow()
@@ -39,7 +39,6 @@ namespace SearchEngine
             if (type == 1)
             {
                 MessageBox.Show(value);
-
             }
 
         }
@@ -98,7 +97,7 @@ namespace SearchEngine
             parser.ModelChanged += vModelChanged;
             Thread thread = new Thread(new ThreadStart(parser.startParsing));
             thread.Start();
-            System.Console.WriteLine("finished all at:" + DateTime.Now);
+            //System.Console.WriteLine("finished all at:" + DateTime.Now);
 
 
         }

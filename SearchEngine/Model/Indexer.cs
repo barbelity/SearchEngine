@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SearchEngine.Model
 {
-    class Indexer : iIndexer
+    class Indexer
     {
 		private SortedList<string, int> mainIndexList1;
 		private SortedList<string, int> mainIndexList2;
@@ -125,7 +125,6 @@ namespace SearchEngine.Model
 
         public void startIndexing(ref SortedDictionary<string, Term>[] d_terms)
         {
-			System.Console.WriteLine("started indexing at:" + DateTime.Now);
 			saveTerms(d_terms[0], "abNumsPosting.txt", mainIndexList1);
             d_terms[0] = null;
             saveTerms(d_terms[1], "cfPosting.txt", mainIndexList2);
@@ -136,7 +135,6 @@ namespace SearchEngine.Model
             d_terms[3] = null;
             saveTerms(d_terms[4], "szPosting.txt", mainIndexList5);
             d_terms[4] = null;
-            System.Console.WriteLine("finished indexing at:" + DateTime.Now);
         }
 
         public void saveLists()

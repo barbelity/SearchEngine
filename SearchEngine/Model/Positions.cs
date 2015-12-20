@@ -8,7 +8,7 @@ namespace SearchEngine.Model
 {
     class Positions
     {
-        private string docName;
+   /*     private string docName;
         List<int> l_position;
         string termType;
 
@@ -24,6 +24,6 @@ namespace SearchEngine.Model
         {
             l_position.Add(p);
         }
-
+		*/
     }
 }

@@ -99,7 +99,6 @@ namespace SearchEngine
             thread.Start();
             //System.Console.WriteLine("finished all at:" + DateTime.Now);
 
-
         }
 
         private void btn_clearPosting_Click(object sender, RoutedEventArgs e)
@@ -163,7 +162,7 @@ namespace SearchEngine
         {
             var openFile = new System.Windows.Forms.FolderBrowserDialog();
             System.Windows.Forms.DialogResult result = openFile.ShowDialog();
-            txtbx_postingDisplay.Text = openFile.SelectedPath.ToString();
+            txtbx_postingPath.Text = openFile.SelectedPath.ToString();
         }
 
         private void btn_loadPosting_Click(object sender, RoutedEventArgs e)

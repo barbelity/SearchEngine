@@ -20,7 +20,11 @@ namespace SearchEngine.Model
         StreamReader postingReader;
         StreamWriter tempWriter;
         string postingPath;
-
+		
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="postingPath">path to save the posting to</param>
         public Indexer(string postingPath)
         {
             this.postingPath = postingPath;
@@ -31,6 +35,11 @@ namespace SearchEngine.Model
 			mainIndexList5 = new SortedList<string, int>();
         }
 
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="postingPath">path to save the posting to</param>
+		/// <param name="v">load posting from files</param>
         public Indexer(string postingPath, bool v)
         {
             this.postingPath = postingPath;
@@ -53,15 +62,21 @@ namespace SearchEngine.Model
 
         }
 
+		/// <summary>
+		/// save terms to posting file
+		/// </summary>
+		/// <param name="terms">dictionary of terms</param>
+		/// <param name="fileName">name of posting file</param>
+		/// <param name="mainIndexList">the index in memory which saves the posting's data</param>
         public void saveTerms(SortedDictionary<string, Term> terms, string fileName, SortedList<string, int> mainIndexList)
         {
-            int lineCount = 0;//on what line in posting i stand
-            int writeLineNumber;//the line number i need to write
-            int insertedTerms = 0;//we must keep trace on how many new terms added
+            int lineCount = 0;
+            int writeLineNumber;
+            int insertedTerms = 0;
             string currTerm;
             string currLine = "";
             fileName = postingPath + "\\" + fileName;
-            //statistics
+
             int currDf;
             postingReader = new StreamReader(fileName);
             if (!File.Exists("tempFile.txt"))
@@ -75,40 +90,34 @@ namespace SearchEngine.Model
                 currDf = tuple.Value.d_locations.Count;
                 if (mainIndexList.ContainsKey(currTerm))
                 {
-                    //update number of files df
                     mainIndexList[currTerm] += currDf;
-                    //get term's index
 					writeLineNumber = mainIndexList.IndexOfKey(currTerm) - insertedTerms;
-                    //move all the lines before to the new file
+
                     for (; lineCount < writeLineNumber; lineCount++)
                     {
                         tempWriter.WriteLine(postingReader.ReadLine());
                     }
-                    //get the required line
+
                     currLine = postingReader.ReadLine();
-                    //edit it
                     currLine += tuple.Value.ToString();
-                    //write it to new file
                     tempWriter.WriteLine(currLine);
-                    //INCREASE LINE?
                     lineCount++;
                 }
                 else
                 {
-                    //update number of files df
                     mainIndexList[currTerm] = currDf;
                     writeLineNumber = mainIndexList.IndexOfKey(currTerm);
-                    //move all the lines before to the new file
+
                     for (; lineCount < writeLineNumber - insertedTerms; lineCount++)
                     {
                         tempWriter.WriteLine(postingReader.ReadLine());
                     }
-                    //write the new term line
+
                     tempWriter.WriteLine(currTerm + "@" + tuple.Value.ToString());
                     insertedTerms++;
                 }
             }
-            //complete writing rest of lines from posting to temp
+
             while (!postingReader.EndOfStream)
             {
                 tempWriter.WriteLine(postingReader.ReadLine());
@@ -122,7 +131,10 @@ namespace SearchEngine.Model
 			File.Delete(fileName + ".old");
         }
 
-
+		/// <summary>
+		/// manages the update of posting files
+		/// </summary>
+		/// <param name="d_terms">pointer to array of dictionaries of terms</param>
         public void startIndexing(ref SortedDictionary<string, Term>[] d_terms)
         {
 			saveTerms(d_terms[0], "abNumsPosting.txt", mainIndexList1);
@@ -137,6 +149,9 @@ namespace SearchEngine.Model
             d_terms[4] = null;
         }
 
+		/// <summary>
+		/// serializes the indexes to files
+		/// </summary>
         public void saveLists()
         {
             File.Delete(postingPath + @"\list1.bin");
@@ -152,6 +167,10 @@ namespace SearchEngine.Model
             formatter.Serialize(new FileStream(postingPath + @"\list5.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList5);
         }
 
+		/// <summary>
+		/// builds a string of posting results
+		/// </summary>
+		/// <returns>result string</returns>
         public string getPostingString()
         {
 
@@ -167,6 +186,11 @@ namespace SearchEngine.Model
 
         }
 
+		/// <summary>
+		/// converts an index-list to string
+		/// </summary>
+		/// <param name="mainIndexList">index-list to write</param>
+		/// <returns>result string</returns>
         private StringBuilder ListToString(SortedList<string, int> mainIndexList)
         {
             StringBuilder ans = new StringBuilder();

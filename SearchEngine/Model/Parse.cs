@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SearchEngine.Model
 {
-    class Parse : iParse
+    class Parse
     {
         // used for events
         public delegate void ModelFunc(int type, string value);
@@ -103,7 +103,7 @@ namespace SearchEngine.Model
                     {
                         t.Join();
                     }
-                    //every 60 files start indexing
+                    //every 40 files start indexing
                     if (j == 40)
                     {
                         j = 0;

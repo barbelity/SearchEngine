@@ -89,11 +89,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\Doc.cs" />
-    <Compile Include="Model\iIndexer.cs" />
     <Compile Include="Model\Indexer.cs" />
-    <Compile Include="Model\iParse.cs" />
     <Compile Include="Model\Parse.cs" />
-    <Compile Include="Model\Positions.cs" />
     <Compile Include="Model\ReadFile.cs" />
     <Compile Include="Model\Stemmer.cs" />
     <Compile Include="Model\Term.cs" />

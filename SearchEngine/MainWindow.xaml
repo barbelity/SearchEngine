@@ -16,7 +16,7 @@
         <StackPanel DockPanel.Dock="Left"
                     Orientation="Vertical">
             <TextBlock DockPanel.Dock="Top"
-                       Text="Date files path: " />
+                       Text="Data files path: " />
             <TextBox Name="txtbx_filesPath"
                      Width="100"
                      DockPanel.Dock="Top"
@@ -29,7 +29,7 @@
                      Margin="2"></TextBox>
             <Button Name="btn_startParsing"
 
-                    Content="Start Parseing"
+                    Content="Start Parsing"
             Margin="2" Click="btn_startParsing_Click"></Button>
             <Button Name="btn_clearPosting"
                     

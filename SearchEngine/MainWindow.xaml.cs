@@ -45,7 +45,7 @@ namespace SearchEngine
 
         private void btn_startParsing_Click(object sender, RoutedEventArgs e)
         {
-          
+
             if (txtbx_filesPath.Text.Length != 0)
             {
                 if (!Directory.Exists(txtbx_filesPath.Text))
@@ -91,13 +91,12 @@ namespace SearchEngine
                 return;
             }
 
-            System.Console.WriteLine("started parsing at:" + DateTime.Now);
+            btn_startParsing.IsEnabled = false;
             indexer = new Indexer(postingPath);
             parser = new Parse(filesPath, indexer, cb_Stemmeing.IsChecked.Value);
             parser.ModelChanged += vModelChanged;
             Thread thread = new Thread(new ThreadStart(parser.startParsing));
             thread.Start();
-            //System.Console.WriteLine("finished all at:" + DateTime.Now);
 
         }
 
@@ -140,7 +139,7 @@ namespace SearchEngine
 
         private void btn_displayPosting_Click(object sender, RoutedEventArgs e)
         {
- 
+
 
             if (indexer != null)
             {
@@ -154,7 +153,7 @@ namespace SearchEngine
         {
             var openFile = new System.Windows.Forms.FolderBrowserDialog();
             System.Windows.Forms.DialogResult result = openFile.ShowDialog();
-            
+
             txtbx_filesPath.Text = openFile.SelectedPath.ToString();
         }
 

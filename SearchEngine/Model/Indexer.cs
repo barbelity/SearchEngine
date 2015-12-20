@@ -200,5 +200,15 @@ namespace SearchEngine.Model
             }
             return ans;
         }
+
+        internal int getNumOfTerms()
+        {
+            int ans = mainIndexList1.Count;
+            ans += mainIndexList2.Count;
+            ans += mainIndexList3.Count;
+            ans += mainIndexList4.Count;
+            ans += mainIndexList5.Count;
+            return ans;
+        }
     }
 }

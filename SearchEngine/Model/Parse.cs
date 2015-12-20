@@ -86,7 +86,8 @@ namespace SearchEngine.Model
         /// </summary>
         public void startParsing()
         {
-
+            ModelChanged(1, "Started parsing");
+            DateTime start = DateTime.Now;
             string[] paths = ReadFile.getFilesPaths(filesPath);
             int i = 0, j = 0;
             foreach (string filePath in paths)
@@ -133,8 +134,8 @@ namespace SearchEngine.Model
             }
             foreach (Thread t in a_Threads)
             {
-				if (t != null)
-					t.Join();
+                if (t != null)
+                    t.Join();
             }
             if (!(t_indexer == null))
             {
@@ -159,8 +160,9 @@ namespace SearchEngine.Model
             d_szTerms = null;
             //save all list data for import
             _indexer.saveLists();
-			System.Console.WriteLine("finished all at:" + DateTime.Now);
-			ModelChanged(1, "Finshed parsing and indexing docs");
+            float time = (DateTime.Now.Minute * 60 + DateTime.Now.Second - start.Minute * 60 - start.Second) / 60;
+            int numOfTerms = _indexer.getNumOfTerms();
+            ModelChanged(1, "Finshed parsing and indexing docs after " + time + " min\n" + "Number of Docs: " + d_docs.Count + "\nNumber of Terms: " + numOfTerms);
 
         }
 
@@ -222,7 +224,7 @@ namespace SearchEngine.Model
             {
                 d_docs[docName] = doc;
             }
-            
+
             //get terms from text
             int numOfTerms = 0;//stores the number of terms in doc
             numOfTerms += getTerms(ref text, datesInOrderRegex, "Date", docName);
@@ -350,7 +352,7 @@ namespace SearchEngine.Model
                         }
                         addTermToDic(d_abNumTerms, price.ToString("C", new CultureInfo("en-US")), docName, term.Index, ref numOfTerms, "Price");
                         break;
-                        
+
                     case "Number":
                         string[] termSplit = termString.Split(' ');
                         Double numformated;
@@ -374,10 +376,10 @@ namespace SearchEngine.Model
                                 numformated = numformated * 100;
                             }
                         }
-                        
-                        addTermToDic(d_abNumTerms, numformated.ToString() , docName, term.Index, ref numOfTerms, "Number");
+
+                        addTermToDic(d_abNumTerms, numformated.ToString(), docName, term.Index, ref numOfTerms, "Number");
                         break;
-                        
+
                     case "Date":
                         try
                         {
@@ -501,7 +503,7 @@ namespace SearchEngine.Model
 
         }
 
-   
+
 
     }
 }

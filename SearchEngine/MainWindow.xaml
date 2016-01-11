@@ -44,6 +44,10 @@
                     Content="Load Posting"
                     Margin="2" Click="btn_loadPosting_Click"/>
             <CheckBox x:Name="cb_Stemmeing" Content="Stemmeing"/>
+            <Button x:Name="btn_exit"
+                    
+            	Content="Exit"
+            	Margin="2"/>
         </StackPanel>
         <TextBox x:Name="txtbx_postingDisplay" DockPanel.Dock="Right"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto"

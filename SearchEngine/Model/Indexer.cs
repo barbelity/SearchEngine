@@ -52,7 +52,7 @@ namespace SearchEngine.Model
                 mainIndexList3 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list3.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
                 mainIndexList4 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list4.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
                 mainIndexList5 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list5.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
-
+                Parse.d_docs = (Dictionary<string, Doc>)formatter.Deserialize(new FileStream(postingPath + @"\Doc.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
             }
             catch (Exception e)
             {
@@ -159,12 +159,14 @@ namespace SearchEngine.Model
             File.Delete(postingPath + @"\list3.bin");
             File.Delete(postingPath + @"\list4.bin");
             File.Delete(postingPath + @"\list5.bin");
+            File.Delete(postingPath + @"\Doc.bin");
             IFormatter formatter = new BinaryFormatter();
             formatter.Serialize(new FileStream(postingPath + @"\list1.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList1);
             formatter.Serialize(new FileStream(postingPath + @"\list2.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList2);
             formatter.Serialize(new FileStream(postingPath + @"\list3.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList3);
             formatter.Serialize(new FileStream(postingPath + @"\list4.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList4);
             formatter.Serialize(new FileStream(postingPath + @"\list5.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList5);
+            formatter.Serialize(new FileStream(postingPath + @"\Doc.bin", FileMode.Create, FileAccess.Write, FileShare.None), Parse.d_docs);
         }
 
 		/// <summary>

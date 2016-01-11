@@ -11,7 +11,6 @@
                       Header="Select Posting path"
                       Margin="3" Click="b_postingPath_Click"/>
 
-
         </Menu>
         <StackPanel DockPanel.Dock="Left"
                     Orientation="Vertical">
@@ -44,10 +43,41 @@
                     Content="Load Posting"
                     Margin="2" Click="btn_loadPosting_Click"/>
             <CheckBox x:Name="cb_Stemmeing" Content="Stemmeing"/>
+            <TextBlock
+            	Text="Query: "/>
+
+            <TextBox x:Name="txtbx_query"
+            	Width="100"
+            	Margin="2"/>
+            <TextBlock
+            	Text="Months: "/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="From:"/>
+                <ComboBox x:Name="combx_fromMonth" Grid.Row="0" Grid.Column="1" Margin="2" Loaded="ComboBox_Loaded"
+	    SelectionChanged="ComboBox_SelectionChanged"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="To:"/>
+                <ComboBox x:Name="combx_toMonth" Grid.Row="1" Grid.Column="1" Margin="2" Loaded="ComboBox_Loaded"
+	    SelectionChanged="ComboBox_SelectionChanged"/>
+
+            </Grid>
+            <Button x:Name="btn_runQuery"
+                    
+            	Content="Run Query"
+            	Margin="2" Click="btn_runQuery_Click"/>
+            
             <Button x:Name="btn_exit"
                     
             	Content="Exit"
             	Margin="2" Click="btn_exit_Click"/>
+            
         </StackPanel>
         <TextBox x:Name="txtbx_postingDisplay" DockPanel.Dock="Right"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto"

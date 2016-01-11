@@ -23,6 +23,22 @@ namespace SearchEngine.Model
         //Mutex mStopwords = new Mutex();
         static private string filesPath;
         static StemmerInterface stemmer = new Stemmer();
+
+        internal static void getTermsFromString(string query)
+        {
+            getTerms(ref query, datesInOrderRegex, "Date", "Query");
+            getTerms(ref query, datesMonthFirstRegex, "Date", "Query");
+            getTerms(ref query, yearsRegex, "Year", "Query");
+            getTerms(ref query, rangeReg, "Range", "Query");
+            getTerms(ref query, percentReg, "Percent", "Query");
+            getTerms(ref query, priceReg, "Price", "Query");
+            getTerms(ref query, numReg, "Number", "Query");
+            getTerms(ref query, namesReg, "Name", "Query");
+            getTerms(ref query, quoteRegex, "Quote", "Query");
+            getTerms(ref query, capsRegex, "CapsHeadline", "Query");
+            getTerms(ref query, wordRegex, "Word", "Query");
+        }
+
         static SortedDictionary<string, Term>[] d_terms = new SortedDictionary<string, Term>[5];
         public static SortedDictionary<string, Term> d_abNumTerms = new SortedDictionary<string, Term>();
         public static SortedDictionary<string, Term> d_cfTerms = new SortedDictionary<string, Term>();

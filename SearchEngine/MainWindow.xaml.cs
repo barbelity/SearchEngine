@@ -26,12 +26,14 @@ namespace SearchEngine
     {
         Indexer indexer;
         Parse parser;
+        Searcher searcher;
+        Ranker ranker;
         string filesPath, postingPath;
         public MainWindow()
         {
 
-
-
+            ranker = new Ranker();
+            searcher = new Searcher(ranker);
 
         }
         private void vModelChanged(int type, string value)
@@ -176,7 +178,16 @@ namespace SearchEngine
             {
                 parser.kill();
             }
+
+        }
+
+        private void btn_runQuery_Click(object sender, RoutedEventArgs e)
+        {
             
+            if (txtbx_query.Text != "")
+            {
+                searcher.searchDocs(txtbx_query.Text, indexer, toMonth, fromMonth);
+            }
         }
 
         private void btn_loadPosting_Click(object sender, RoutedEventArgs e)
@@ -199,5 +210,50 @@ namespace SearchEngine
 
             indexer = new Indexer(postingPath, true);
         }
+
+        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            // ... A List.
+            List<string> data = new List<string>();
+            data.Add("");
+            for (int i = 1; i < 13; i++)
+            {
+                data.Add(i.ToString());
+            }
+
+
+            // ... Get the ComboBox reference.
+            var comboBox = sender as ComboBox;
+
+            // ... Assign the ItemsSource to the List.
+            comboBox.ItemsSource = data;
+
+            // ... Make the first item selected.
+            comboBox.SelectedIndex = 0;
+        }
+
+        int fromMonth=0, toMonth = 0;
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // ... Get the ComboBox.
+            var comboBox = sender as ComboBox;
+            if (comboBox.Name == "combx_fromMonth")
+            {
+                fromMonth = comboBox.SelectedIndex;
+            }
+            else
+            {
+                toMonth = comboBox.SelectedIndex;
+            }
+            
+            
+            /*
+            // ... Set SelectedItem as Window Title.
+            string value = comboBox.SelectedItem as string;
+            this.Title = "Selected: " + value;
+            */
+        }
+
+
     }
 }

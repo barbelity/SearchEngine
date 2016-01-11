@@ -73,6 +73,7 @@ namespace SearchEngine.Model
             if (Parse.stop) return;
             int lineCount = 0;
             int writeLineNumber;
+
             int insertedTerms = 0;
             string currTerm;
             string currLine = "";

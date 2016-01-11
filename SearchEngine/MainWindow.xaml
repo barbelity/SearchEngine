@@ -47,7 +47,7 @@
             <Button x:Name="btn_exit"
                     
             	Content="Exit"
-            	Margin="2"/>
+            	Margin="2" Click="btn_exit_Click"/>
         </StackPanel>
         <TextBox x:Name="txtbx_postingDisplay" DockPanel.Dock="Right"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto"

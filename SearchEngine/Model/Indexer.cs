@@ -70,6 +70,7 @@ namespace SearchEngine.Model
 		/// <param name="mainIndexList">the index in memory which saves the posting's data</param>
         public void saveTerms(SortedDictionary<string, Term> terms, string fileName, SortedList<string, int> mainIndexList)
         {
+            if (Parse.stop) return;
             int lineCount = 0;
             int writeLineNumber;
             int insertedTerms = 0;

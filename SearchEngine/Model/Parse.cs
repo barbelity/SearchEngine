@@ -92,6 +92,7 @@ namespace SearchEngine.Model
             int i = 0, j = 0;
             foreach (string filePath in paths)
             {
+                if (stop) return;
                 //runs every file in a new thread
                 a_Threads[i] = new Thread(new ParameterizedThreadStart(ThreadParsing));
                 a_Threads[i].Start(filePath);
@@ -166,6 +167,18 @@ namespace SearchEngine.Model
 
         }
 
+        internal static bool stop = false;
+        internal void kill()
+        {
+            stop = true;
+            if (a_Threads != null)
+                for (int i = 0; i < a_Threads.Length; i++)
+                    if (a_Threads[i] != null)
+                        a_Threads[i].Join();
+
+            if (t_indexer != null) t_indexer.Join();
+        }
+
         /// <summary>
         /// calls indexing used in a new thread
         /// </summary>
@@ -188,7 +201,7 @@ namespace SearchEngine.Model
                 if (doc.Length > 3)
                 {
                     parseDoc(doc);
-
+                    
                 }
             }
         }

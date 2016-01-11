@@ -164,6 +164,21 @@ namespace SearchEngine
             txtbx_postingPath.Text = openFile.SelectedPath.ToString();
         }
 
+        private void btn_exit_Click(object sender, RoutedEventArgs e)
+        {
+            killAll();
+            Application.Current.Shutdown();
+        }
+
+        private void killAll()
+        {
+            if (parser != null)
+            {
+                parser.kill();
+            }
+            
+        }
+
         private void btn_loadPosting_Click(object sender, RoutedEventArgs e)
         {
             if (txtbx_postingPath.Text.Length != 0)

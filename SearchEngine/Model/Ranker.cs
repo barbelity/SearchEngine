@@ -8,5 +8,20 @@ namespace SearchEngine.Model
 {
     class Ranker
     {
+
+		private string StartRanking(List<Doc> docs, List<Term> queryTerms)
+		{
+			string ans = "";
+			
+
+
+
+
+
+			return ans;
+		}
+
+
+
     }
 }

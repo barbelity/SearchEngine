@@ -6,6 +6,7 @@ using System.Threading;
 
 namespace SearchEngine.Model
 {
+    [Serializable()]
     class Doc
     {
 

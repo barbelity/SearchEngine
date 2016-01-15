@@ -11,11 +11,11 @@ namespace SearchEngine.Model
 {
     class Indexer
     {
-		private SortedList<string, int> mainIndexList1;
-		private SortedList<string, int> mainIndexList2;
-		private SortedList<string, int> mainIndexList3;
-		private SortedList<string, int> mainIndexList4;
-		private SortedList<string, int> mainIndexList5;
+		public SortedList<string, int> mainIndexList1;
+		public SortedList<string, int> mainIndexList2;
+		public SortedList<string, int> mainIndexList3;
+		public SortedList<string, int> mainIndexList4;
+		public SortedList<string, int> mainIndexList5;
 
         StreamReader postingReader;
         StreamWriter tempWriter;
@@ -53,6 +53,7 @@ namespace SearchEngine.Model
                 mainIndexList4 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list4.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
                 mainIndexList5 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list5.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
                 Parse.d_docs = (Dictionary<string, Doc>)formatter.Deserialize(new FileStream(postingPath + @"\Doc.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+                Parse.StopWords = ReadFile.readStopWords(postingPath + @"\stop_words.txt");
             }
             catch (Exception e)
             {
@@ -169,6 +170,7 @@ namespace SearchEngine.Model
             formatter.Serialize(new FileStream(postingPath + @"\list4.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList4);
             formatter.Serialize(new FileStream(postingPath + @"\list5.bin", FileMode.Create, FileAccess.Write, FileShare.None), mainIndexList5);
             formatter.Serialize(new FileStream(postingPath + @"\Doc.bin", FileMode.Create, FileAccess.Write, FileShare.None), Parse.d_docs);
+            Parse.StopWords = ReadFile.readStopWords(postingPath + @"\stop_words.txt");
         }
 
 		/// <summary>

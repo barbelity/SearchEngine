@@ -19,7 +19,7 @@ namespace SearchEngine.Model
         public event ModelFunc ModelChanged;
 
         static Dictionary<string, string> months = new Dictionary<string, string>();
-        static private Dictionary<string, bool> StopWords;
+        static public Dictionary<string, bool> StopWords;
         //Mutex mStopwords = new Mutex();
         static private string filesPath;
         static StemmerInterface stemmer = new Stemmer();
@@ -82,15 +82,16 @@ namespace SearchEngine.Model
         /// <summary>
         /// constractor
         /// </summary>
-        /// <param name="Path">path to data files</param>
+        /// <param name="PathData">path to data files</param>
         /// <param name="indexer">instanc of indexer</param>
         /// <param name="stemming">yes/no stemming</param>
-        public Parse(string Path, Indexer indexer, bool stemming)
+        public Parse(string PathData, string PathPosting, Indexer indexer, bool stemming)
         {
             use_stem = stemming;
-            filesPath = Path;
+            filesPath = PathData;
             _indexer = indexer;
-            StopWords = ReadFile.readStopWords(Path + @"\stop_words.txt");
+            StopWords = ReadFile.readStopWords(PathData + @"\stop_words.txt");
+            File.Copy(PathData + @"\stop_words.txt", PathPosting + @"\stop_words.txt");
             addMonths();
         }
 
@@ -332,7 +333,7 @@ namespace SearchEngine.Model
                 termString = term.ToString().ToLower().Replace('\n', ' ').Trim(charsToTrim);
 
                 // Stop words
-                if (StopWords.ContainsKey(termString) || termString.Length <= 2)
+                if (StopWords.ContainsKey(termString) || termString.Length <= 0)
                     continue;
 
                 if (!(type[0] == 'W') && !(type[0] == 'N') && !(type[0] == 'Q') && !(type[0] == 'C'))

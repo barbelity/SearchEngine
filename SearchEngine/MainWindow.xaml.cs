@@ -95,7 +95,7 @@ namespace SearchEngine
 
             btn_startParsing.IsEnabled = false;
             indexer = new Indexer(postingPath);
-            parser = new Parse(filesPath, indexer, cb_Stemmeing.IsChecked.Value);
+            parser = new Parse(filesPath, postingPath, indexer, cb_Stemmeing.IsChecked.Value);
             parser.ModelChanged += vModelChanged;
             Thread thread = new Thread(new ThreadStart(parser.startParsing));
             thread.Start();

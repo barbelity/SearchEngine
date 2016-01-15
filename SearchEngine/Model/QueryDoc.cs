@@ -13,9 +13,9 @@ namespace SearchEngine.Model
 		public string docName { get; set; } 
 
 		//doc's value related to current query
-		public QueryTerm queryTerm { get; set; }
+		public List<QueryTerm> queryTerm { get; set; }
 
-		public QueryDoc(string docName, QueryTerm queryTerm)
+		public QueryDoc(string docName, List<QueryTerm> queryTerm)
 		{
 			this.docName = docName;
 			this.queryTerm = queryTerm;

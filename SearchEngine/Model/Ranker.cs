@@ -9,16 +9,17 @@ namespace SearchEngine.Model
     class Ranker
     {
 
-		private string StartRanking(List<Doc> docs, List<Term> queryTerms)
+		private List<string> StartRanking(List<QueryDoc> queryTerms, int numOfDocsInEngine)
 		{
-			string ans = "";
-			
+			List<string> ans = new List<string>();
+
 
 
 
 
 
 			return ans;
+
 		}
 
 

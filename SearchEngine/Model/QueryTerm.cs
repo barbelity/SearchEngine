@@ -12,29 +12,23 @@ namespace SearchEngine.Model
        //related term
 		public Term term { get; set; }
 
-		//string is doc name, int is df
-		public List<KeyValuePair<string, int>> termInDoc { get; set; }
+		//occurences in current document
+		public int tf { get; set; }
+
+		//number of docs this term exists
+		public int td { get; set; }
 
 		//how many occurences of term in query
 		public int queryOccurence { get; set; }
 
 
-		public QueryTerm(Term t)
+		public QueryTerm(Term term, int tf, int td, int queryOccurence)
 		{
-			term = t;
-			termInDoc = new List<KeyValuePair<string, int>>();
-			queryOccurence = 1;
+			this.term = term;
+			this.tf = tf;
+			this.td = td;
+			this.queryOccurence = queryOccurence;
 		}
-
-		public QueryTerm(Term t, List<KeyValuePair<string, int>> tid, int occ)
-        {
-			term = t;
-			termInDoc = tid;
-			queryOccurence = occ;
-
-        }
-
-
 
 	}
 }

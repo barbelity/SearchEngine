@@ -40,11 +40,11 @@ namespace SearchEngine.Model
         }
 
         static SortedDictionary<string, Term>[] d_terms = new SortedDictionary<string, Term>[5];
-        public static SortedDictionary<string, Term> d_abNumTerms = new SortedDictionary<string, Term>();
-        public static SortedDictionary<string, Term> d_cfTerms = new SortedDictionary<string, Term>();
-        public static SortedDictionary<string, Term> d_gmTerms = new SortedDictionary<string, Term>();
-        public static SortedDictionary<string, Term> d_nrTerms = new SortedDictionary<string, Term>();
-        public static SortedDictionary<string, Term> d_szTerms = new SortedDictionary<string, Term>();
+        public static SortedDictionary<string, Term> d_abNumTerms;
+        public static SortedDictionary<string, Term> d_cfTerms;
+        public static SortedDictionary<string, Term> d_gmTerms;
+        public static SortedDictionary<string, Term> d_nrTerms;
+        public static SortedDictionary<string, Term> d_szTerms;
         public static Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
 
 
@@ -87,6 +87,11 @@ namespace SearchEngine.Model
         /// <param name="stemming">yes/no stemming</param>
         public Parse(string PathData, string PathPosting, Indexer indexer, bool stemming)
         {
+            d_abNumTerms = new SortedDictionary<string, Term>();
+            d_cfTerms = new SortedDictionary<string, Term>();
+            d_gmTerms = new SortedDictionary<string, Term>();
+            d_nrTerms = new SortedDictionary<string, Term>();
+            d_szTerms = new SortedDictionary<string, Term>();
             use_stem = stemming;
             filesPath = PathData;
             _indexer = indexer;
@@ -95,15 +100,18 @@ namespace SearchEngine.Model
             {
                 File.Copy(PathData + @"\stop_words.txt", PathPosting + @"\stop_words.txt");
             }
+            if (months.Count ==0)
+            {
+                addMonths();
+            }
             
-            addMonths();
         }
 
 
         Thread[] a_Threads = new Thread[8];
         Thread t_indexer = null;
         /// <summary>
-        /// main func for parsing
+        /// main function for parsing
         /// </summary>
         public void startParsing()
         {

@@ -71,7 +71,7 @@
             <Button x:Name="btn_runQuery"
                     
             	Content="Run Query"
-            	Margin="2" Click="btn_runQuery_Click"/>
+            	Margin="2" Click="btn_runQuery_Click" IsEnabled="False"/>
             
             <Button x:Name="btn_exit"
                     

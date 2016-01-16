@@ -54,6 +54,7 @@ namespace SearchEngine.Model
                 mainIndexList5 = (SortedList<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\list5.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
                 Parse.d_docs = (Dictionary<string, Doc>)formatter.Deserialize(new FileStream(postingPath + @"\Doc.bin", FileMode.Open, FileAccess.Read, FileShare.Read));
                 Parse.StopWords = ReadFile.readStopWords(postingPath + @"\stop_words.txt");
+                
             }
             catch (Exception e)
             {

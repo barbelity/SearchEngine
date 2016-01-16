@@ -50,7 +50,7 @@ namespace SearchEngine
             }
             else if (type == 2)
             {
-                
+
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     List<string> ans = searcher.getResult();
@@ -129,6 +129,7 @@ namespace SearchEngine
             Thread thread = new Thread(new ThreadStart(parser.startParsing));
             thread.Start();
             btn_runQuery.IsEnabled = true;
+            btn_runQueryFile.IsEnabled = true;
 
         }
 
@@ -165,16 +166,18 @@ namespace SearchEngine
                 File.Delete(postingPath + @"\Doc.bin");
                 if (Directory.Exists(postingPath + @"\docs\"))
                     Directory.Delete(postingPath + @"\docs\");
-                
-                
+
+
                 MessageBox.Show("Posting Files were cleared");
                 btn_startParsing.IsEnabled = true;
                 btn_clearPosting.IsEnabled = true;
                 btn_runQuery.IsEnabled = false;
+                btn_runQueryFile.IsEnabled = false;
             }
             catch (Exception exp)
             {
                 btn_clearPosting.IsEnabled = true;
+                btn_runQueryFile.IsEnabled = true;
                 MessageBox.Show("clearing Posting Files failed");
                 return;
             }
@@ -219,7 +222,7 @@ namespace SearchEngine
             {
                 parser.kill();
                 searcher.kill();
-                if(t_query !=null && t_query.IsAlive)
+                if (t_query != null && t_query.IsAlive)
                     t_query.Join();
             }
 
@@ -227,7 +230,7 @@ namespace SearchEngine
         Thread t_query;
         private void btn_runQuery_Click(object sender, RoutedEventArgs e)
         {
-            
+
             if (txtbx_query.Text != "")
             {
                 txtbx_postingDisplay.Text = "";
@@ -263,6 +266,7 @@ namespace SearchEngine
             btn_startParsing.IsEnabled = false;
             btn_loadPosting.IsEnabled = false;
             btn_runQuery.IsEnabled = true;
+            btn_runQueryFile.IsEnabled = true;
             MessageBox.Show("Posting was loaded from file");
         }
 
@@ -287,8 +291,11 @@ namespace SearchEngine
             comboBox.SelectedIndex = 0;
         }
 
-        int fromMonth=0, toMonth = 0;
-        /*
+        int fromMonth = 0, toMonth = 0;
+        Thread t_multiQuery;
+        private bool multiThread;
+        string[] queries;
+        List<string> result;
         private void btn_runQueryFile_Click(object sender, RoutedEventArgs e)
         {
             if (txtbx_postingPath.Text.Length != 0)
@@ -305,18 +312,45 @@ namespace SearchEngine
                 Parse.use_stem = cb_Stemmeing.IsChecked.Value;
 
                 postingPath = txtbx_postingPath.Text;
-                using (StreamReader sr = new StreamReader(postingPath + "\\queries.txt"))
+                try
                 {
-                    string line = sr.ReadLine();
-                    int num= int.Parse(line.Substring(0, 4));
-                    searcher.queryText = line.Substring(4);
-                    t_query = new Thread(() => searcher.searchDocs());
-                    t_query.Start();
+                    queries = File.ReadAllLines(postingPath + "\\queries.txt");
                 }
+                catch (Exception)
+                {
+
+                    MessageBox.Show("Please add a queries.txt file at posting path");
+                    return;
+                }
+                t_multiQuery = new Thread(delegate ()
+                {
+                    if (File.Exists(postingPath + "\\result.txt"))
+                    {
+                        File.Delete(postingPath + "\\result.txt");
+                    }
+
+                    foreach (var line in queries)
+                    {
+                        int num = int.Parse(line.Substring(0, 4));
+                        searcher.queryText = line.Substring(4);
+                        searcher.searchDocs();
+                        result = searcher.getResult();
+                        using (StreamWriter sw = File.AppendText(postingPath + "\\result.txt"))
+                        {
+                            foreach (var item in result)
+                            {
+                                sw.WriteLine(num.ToString() + " 0 " + item + " 0 42.38 mt");
+                            }
+                        }
+                    }
+
+                });
+                t_multiQuery.Start();
                 
+
             }
         }
-        */
+
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -330,8 +364,8 @@ namespace SearchEngine
             {
                 toMonth = comboBox.SelectedIndex;
             }
-            
-            
+
+
             /*
             // ... Set SelectedItem as Window Title.
             string value = comboBox.SelectedItem as string;

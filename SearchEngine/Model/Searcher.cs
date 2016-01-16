@@ -40,10 +40,11 @@ namespace SearchEngine.Model
 
             mutableQuery = new Dictionary<string, int>();
             string[] splitedQuery = queryText.Split(' ');
+            string mutableTerm;
             for (int i = 0; i < splitedQuery.Length; i++)
             {
-                string mutableTerm;
-                if (splitedQuery[i][0] == '%' && splitedQuery[i][splitedQuery[i].Length - 1] == '%')
+                
+                if (splitedQuery[i].Length >2 && splitedQuery[i][0] == '%' && splitedQuery[i][splitedQuery[i].Length - 1] == '%')
                 {
                     mutableTerm = splitedQuery[i].Substring(1, splitedQuery[i].Length - 2);
                     if (mutableQuery.ContainsKey(mutableTerm))
@@ -149,7 +150,7 @@ namespace SearchEngine.Model
             } */
 
             result = ranker.StartRanking(queryDocs, Parse.d_docs);
-
+            /*
             using (StreamWriter sw = File.AppendText(_indexer.postingPath + "\\result.txt"))
             {
                 foreach (var item in result)
@@ -157,7 +158,7 @@ namespace SearchEngine.Model
                     sw.WriteLine("11 0 " + item + " 0 42.38 mt");
                 }
             }
-
+            */
             SearcherChanged(2, "");
 
         }

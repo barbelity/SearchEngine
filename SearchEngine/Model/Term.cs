@@ -5,55 +5,55 @@ using System.Text;
 
 namespace SearchEngine.Model
 {
-	class Term
-	{
+    class Term
+    {
 
 
-			   public string type { get; set; }
-			   public string termString { get; set; }
-			   // <docName,positions> example positions="4,7,8,"
-			   public Dictionary<string, StringBuilder> d_locations { get; set; }
+        public string type { get; set; }
+        public string termString { get; set; }
+        // <docName,positions> example positions="4,7,8,"
+        public Dictionary<string, StringBuilder> d_locations { get; set; }
+        public Dictionary<string, int> d_docTf { get; set; }
+        public Term(string type, string termString)
+        {
+            d_locations = new Dictionary<string, StringBuilder>();
+            this.type = type;
+            this.termString = termString;
+        }
 
-			   public Term(string type, string termString)
-			   {
-				   d_locations = new Dictionary<string, StringBuilder>();
-				   this.type = type;
-				   this.termString = termString;
-			   }
+        public override int GetHashCode()
+        {
+            return termString.GetHashCode();
+        }
 
-			   public override int GetHashCode()
-			   {
-				   return termString.GetHashCode();
-			   }
+        internal void addPosition(string docNme, int p)
+        {
+            if (!d_locations.ContainsKey(docNme))
+            {
+                d_locations[docNme] = new StringBuilder(p + ",");
 
-			   internal void addPosition(string docNme, int p)
-			   {
-				   if (!d_locations.ContainsKey(docNme))
-				   {
-					   d_locations[docNme] = new StringBuilder(p + ",");
+            }
+            else
+            {
+                d_locations[docNme].Append(p + ",");
+            }
 
-				   }
-				   else
-				   {
-					   d_locations[docNme].Append(p + ",");
-				   }
+        }
+        public override string ToString()
+        {
+            string tfCount = "";
 
-			   }
-			   public override string ToString()
-			   {
-				   string tfCount = "";
-				    
-				   StringBuilder tempAns = new StringBuilder();
-				   foreach (var pair in d_locations)
-				   {
-					   tfCount = pair.Value.ToString();
-					   tempAns.Append(pair.Key + ";" + tfCount.Count(x => x == ',') + ":");
-					   tempAns.Append(pair.Value);
-					   tempAns.Append('|');
-					   tfCount += pair.Key + ";";
-					   
-				   }
-				   return tempAns.ToString();
-			   }
-		   }
+            StringBuilder tempAns = new StringBuilder();
+            foreach (var pair in d_locations)
+            {
+                tfCount = pair.Value.ToString();
+                tempAns.Append(pair.Key + ";" + tfCount.Count(x => x == ',') + ":");
+                tempAns.Append(pair.Value);
+                tempAns.Append('|');
+                tfCount += pair.Key + ";";
+
+            }
+            return tempAns.ToString();
+        }
+    }
 }

@@ -17,7 +17,7 @@ namespace SearchEngine.Model
         // used for events
         public delegate void ModelFunc(int type, string value);
         public event ModelFunc ModelChanged;
-
+        public static string postingPath;
         static Dictionary<string, string> months = new Dictionary<string, string>();
         static public Dictionary<string, bool> StopWords;
         //Mutex mStopwords = new Mutex();
@@ -95,6 +95,7 @@ namespace SearchEngine.Model
             use_stem = stemming;
             filesPath = PathData;
             _indexer = indexer;
+            postingPath = PathPosting;
             StopWords = ReadFile.readStopWords(PathData + @"\stop_words.txt");
             if (!File.Exists(PathPosting + @"\stop_words.txt"))
             {
@@ -234,7 +235,7 @@ namespace SearchEngine.Model
                 }
             }
         }
-
+        
         /// <summary>
         /// parse a singel doc for ThreadParsing
         /// </summary>
@@ -282,6 +283,11 @@ namespace SearchEngine.Model
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
             //update numOfTerms - if we put it in constructor of doc it saves time
             doc.termsCount = numOfTerms;
+            using (FileStream fs = new FileStream(postingPath + @"\docs\" + doc.docName +".bin", FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(fs, doc.d_TermsCount);
+            } 
             doc.d_TermsCount = null;
         }
 

@@ -32,6 +32,9 @@ namespace SearchEngine.Model
             addMonths();
         }
 
+        /// <summary>
+        ///  searches docs by query
+        /// </summary>
         internal void searchDocs()
         {
 
@@ -164,6 +167,12 @@ namespace SearchEngine.Model
             return result;
         }
 
+        /// <summary>
+        /// search in one dictionary 
+        /// </summary>
+        /// <param name="dict">dictionary with terms to search</param>
+        /// <param name="mainIndexList1">list with terms location in posting files</param>
+        /// <param name="fileName">posting file name</param>
         private void getReleventDocs(SortedDictionary<string, Term> dict, SortedList<string, int> mainIndexList1, string fileName)
         {
             using (StreamReader postingReader = new StreamReader(_indexer.postingPath + "\\" + fileName))

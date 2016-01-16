@@ -51,7 +51,7 @@ namespace SearchEngine.Model
 					//reuse idf values to avoid recalculation
 					if (!(termsData.ContainsKey(qt.term.termString)))
 					{
-						idf = Math.Log((numOfDocsInEngine / qt.td), 2);
+						idf = Math.Log((numOfDocsInEngine / qt.term.d_docTf.Count), 2);
 						termsData[qt.term.termString] = idf;
 					}
 					else
@@ -68,9 +68,9 @@ namespace SearchEngine.Model
 				}
 
 				//calculate cosine
-				double cosineDenominator = sigmaWijSqr * sigmaWiqSqr;
-				cosineDenominator = Math.Sqrt(cosineDenominator);
-				double cosine = sigmaWijWiq / cosineDenominator;
+				double cosineDenominator = (double)sigmaWijSqr * (double)sigmaWiqSqr;
+				cosineDenominator = (double)Math.Sqrt(cosineDenominator);
+				double cosine = (double)sigmaWijWiq / (double)cosineDenominator;
 				
 				//insert result to docsRanks
 				if (docsRanks.ContainsKey(cosine))

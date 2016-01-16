@@ -207,6 +207,10 @@ namespace SearchEngine.Model
             return ans;
         }
 
+		/// <summary>
+		/// returns the total number of terms exists
+		/// </summary>
+		/// <returns>number of terms</returns>
         internal int getNumOfTerms()
         {
             int ans = mainIndexList1.Count;
@@ -217,7 +221,11 @@ namespace SearchEngine.Model
             return ans;
         }
 
-
+		/// <summary>
+		/// convers line from posting file to Term object
+		/// </summary>
+		/// <param name="line">string of Posting's data</param>
+		/// <returns>Term, constructed from the posting-line received</returns>
 		public Term convertPostingStringToTerm(string line)
 		{
 			Term result = new Term();

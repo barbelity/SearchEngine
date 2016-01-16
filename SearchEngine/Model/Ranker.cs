@@ -10,13 +10,20 @@ namespace SearchEngine.Model
     {
 		private Dictionary<string, double> termsData;
 
-
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		public Ranker()
 		{
 			termsData = new Dictionary<string, double>();
 		}
 
-
+		/// <summary>
+		/// evaluates the relevant documents according to a specific query
+		/// </summary>
+		/// <param name="queryDocs">list of relevant documents to be evaluated with the required data for the evaluating process</param>
+		/// <param name="dDocs">documents metada</param>
+		/// <returns>list of QueryDocs, sorted from the most relevant to the least</returns>
 		private List<string> StartRanking(List<QueryDoc> queryDocs, Dictionary<string, Doc> dDocs)
 		{
 			List<string> ans = new List<string>();

@@ -34,9 +34,29 @@ namespace SearchEngine
 
             ranker = new Ranker();
             searcher = new Searcher(ranker);
+            searcher.SearcherChanged += vSearcherChanged;
 
         }
-        internal static void vModelChanged(int type, string value)
+        private void vSearcherChanged(int type, string value)
+        {
+            if (type == 1)
+            {
+                MessageBox.Show(value);
+            }
+            else if (type == 2)
+            {
+                
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    List<string> ans = searcher.getResult();
+                    if (ans.Count > 1)
+                        txtbx_postingDisplay.Text = ans.Aggregate((i, j) => i + '\n' + j);
+                    else if (ans.Count == 1) txtbx_postingDisplay.Text = ans.ElementAt(0);
+                }));
+            }
+
+        }
+        private void vModelChanged(int type, string value)
         {
             if (type == 1)
             {
@@ -94,11 +114,13 @@ namespace SearchEngine
             }
 
             btn_startParsing.IsEnabled = false;
+            btn_loadPosting.IsEnabled = false;
             indexer = new Indexer(postingPath);
             parser = new Parse(filesPath, postingPath, indexer, cb_Stemmeing.IsChecked.Value);
             parser.ModelChanged += vModelChanged;
             Thread thread = new Thread(new ThreadStart(parser.startParsing));
             thread.Start();
+            btn_runQuery.IsEnabled = true;
 
         }
 
@@ -121,6 +143,7 @@ namespace SearchEngine
 
             try
             {
+                btn_clearPosting.IsEnabled = false;
                 File.Delete(postingPath + @"\abNumsPosting.txt");
                 File.Delete(postingPath + @"\cfPosting.txt");
                 File.Delete(postingPath + @"\gmPosting.txt");
@@ -133,10 +156,14 @@ namespace SearchEngine
                 File.Delete(postingPath + @"\list5.bin");
                 File.Delete(postingPath + @"\Doc.bin");
                 MessageBox.Show("Posting Files were cleared");
+                btn_startParsing.IsEnabled = true;
+                btn_clearPosting.IsEnabled = true;
+                btn_runQuery.IsEnabled = false;
             }
             catch (Exception exp)
             {
-
+                btn_clearPosting.IsEnabled = true;
+                MessageBox.Show("clearing Posting Files failed");
                 return;
             }
         }
@@ -179,16 +206,24 @@ namespace SearchEngine
             if (parser != null)
             {
                 parser.kill();
+                searcher.kill();
+                t_query.Join();
             }
 
         }
-
+        Thread t_query;
         private void btn_runQuery_Click(object sender, RoutedEventArgs e)
         {
             
             if (txtbx_query.Text != "")
             {
-                searcher.searchDocs(txtbx_query.Text, indexer, toMonth, fromMonth);
+                txtbx_postingDisplay.Text = "";
+                searcher.toMonth = toMonth;
+                searcher.fromMonth = fromMonth;
+                searcher._indexer = indexer;
+                searcher.queryText = txtbx_query.Text;
+                t_query = new Thread(() => searcher.searchDocs());
+                t_query.Start();
             }
         }
 
@@ -211,6 +246,10 @@ namespace SearchEngine
             }
 
             indexer = new Indexer(postingPath, true);
+            btn_startParsing.IsEnabled = false;
+            btn_loadPosting.IsEnabled = false;
+            btn_runQuery.IsEnabled = true;
+            MessageBox.Show("Posting was loaded from file");
         }
 
         private void ComboBox_Loaded(object sender, RoutedEventArgs e)

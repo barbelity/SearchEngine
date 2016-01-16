@@ -17,7 +17,7 @@ namespace SearchEngine.Model
 		}
 
 
-		private List<string> StartRanking(List<QueryDoc> queryDocs, Dictionary<string, Doc> dDocs)
+		internal List<string> StartRanking(Dictionary<string, QueryDoc> queryDocs, Dictionary<string, Doc> dDocs)
 		{
 			List<string> ans = new List<string>();
 			SortedList<double, List<string>> docsRanks = new SortedList<double, List<string>>();
@@ -33,7 +33,7 @@ namespace SearchEngine.Model
 			double sigmaWiqSqr = 0;
 			int numOfDocsInEngine = dDocs.Count;
 
-			foreach (QueryDoc qd in queryDocs)
+			foreach (QueryDoc qd in queryDocs.Values)
 			{
 				maxTf = dDocs[qd.docName].maxtfCount;
 
@@ -82,7 +82,7 @@ namespace SearchEngine.Model
 				sigmaWiqSqr = 0;
 			}
 
-			//now i have docsranks, need to extract top 50
+			//now i have docs ranks, need to extract top 50
 			int resultsCount = 0;
 			KeyValuePair<double, List<string>> docList;
 			for (int i = docsRanks.Count - 1; i >= 0; i-- )

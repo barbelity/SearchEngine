@@ -29,6 +29,10 @@ namespace SearchEngine
         Searcher searcher;
         Ranker ranker;
         string filesPath, postingPath;
+
+        /// <summary>
+        /// mail constructor
+        /// </summary>
         public MainWindow()
         {
 
@@ -37,6 +41,7 @@ namespace SearchEngine
             searcher.SearcherChanged += vSearcherChanged;
 
         }
+
         private void vSearcherChanged(int type, string value)
         {
             if (type == 1)
@@ -207,7 +212,8 @@ namespace SearchEngine
             {
                 parser.kill();
                 searcher.kill();
-                t_query.Join();
+                if(t_query !=null && t_query.IsAlive)
+                    t_query.Join();
             }
 
         }
@@ -222,6 +228,7 @@ namespace SearchEngine
                 searcher.fromMonth = fromMonth;
                 searcher._indexer = indexer;
                 searcher.queryText = txtbx_query.Text;
+                Parse.use_stem = cb_Stemmeing.IsChecked.Value;
                 t_query = new Thread(() => searcher.searchDocs());
                 t_query.Start();
             }
@@ -274,6 +281,36 @@ namespace SearchEngine
         }
 
         int fromMonth=0, toMonth = 0;
+        /*
+        private void btn_runQueryFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (txtbx_postingPath.Text.Length != 0)
+            {
+                if (!Directory.Exists(txtbx_postingPath.Text))
+                {
+                    MessageBox.Show("Please enter a valid Posting Files path");
+                    return;
+                }
+
+                searcher.toMonth = toMonth;
+                searcher.fromMonth = fromMonth;
+                searcher._indexer = indexer;
+                Parse.use_stem = cb_Stemmeing.IsChecked.Value;
+
+                postingPath = txtbx_postingPath.Text;
+                using (StreamReader sr = new StreamReader(postingPath + "\\queries.txt"))
+                {
+                    string line = sr.ReadLine();
+                    int num= int.Parse(line.Substring(0, 4));
+                    searcher.queryText = line.Substring(4);
+                    t_query = new Thread(() => searcher.searchDocs());
+                    t_query.Start();
+                }
+                
+            }
+        }
+        */
+
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // ... Get the ComboBox.

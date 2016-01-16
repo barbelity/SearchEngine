@@ -48,7 +48,7 @@ namespace SearchEngine.Model
         public static Dictionary<string, Doc> d_docs = new Dictionary<string, Doc>();
 
 
-        static bool use_stem = false;
+        public static bool use_stem = false;
 
         static private char[] charsToTrim = { ',', '.', ' ', ';', ':', '~', '|', '\n' };
         #region Regex's

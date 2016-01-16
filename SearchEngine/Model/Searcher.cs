@@ -107,7 +107,8 @@ namespace SearchEngine.Model
                                     l_temp.Add(stringQTermPair.Value);
                                     queryDocs[docNameLocationsPair.Key] = new QueryDoc(docNameLocationsPair.Key, l_temp);
                                 }
-                                else if (!months.ContainsKey(sdate)){
+                                else if (!months.ContainsKey(sdate))
+                                {
                                     date = Convert.ToDateTime(Parse.d_docs[docNameLocationsPair.Key].date);
                                     if ((toMonth == 0 || date.Month <= toMonth) && date.Month >= fromMonth)
                                     {
@@ -132,7 +133,28 @@ namespace SearchEngine.Model
                     }
                 }
             }
+            /*
+            using (StreamReader sr = new StreamReader(_indexer.postingPath + "\\ans.txt"))
+            {
+                string line  = sr.ReadLine();
+                int j = 0;
+                if (!queryDocs.ContainsKey(line))
+                {
+                    j++;
+                    Console.WriteLine(j+") missing: " + line);
+                }
+            } */
+
             result = ranker.StartRanking(queryDocs, Parse.d_docs);
+
+            using (StreamWriter sw = File.AppendText(_indexer.postingPath + "\\result.txt"))
+            {
+                foreach (var item in result)
+                {
+                    sw.WriteLine("11 0 " + item + " 0 42.38 mt");
+                }
+            }
+
             SearcherChanged(2, "");
 
         }
@@ -184,6 +206,8 @@ namespace SearchEngine.Model
             _kill = true;
         }
         static Dictionary<string, int> months = new Dictionary<string, int>();
+
+
         private void addMonths()
         {
             months.Add("january", 1);

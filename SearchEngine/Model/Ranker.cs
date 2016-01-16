@@ -17,7 +17,7 @@ namespace SearchEngine.Model
 		}
 
 
-		private List<string> StartRanking(List<QueryDoc> queryDocs, int numOfDocsInEngine, int numOfWordsInQuery)
+		private List<string> StartRanking(List<QueryDoc> queryDocs, Dictionary<string, Doc> dDocs)
 		{
 			List<string> ans = new List<string>();
 			SortedList<double, List<string>> docsRanks = new SortedList<double, List<string>>();
@@ -26,16 +26,16 @@ namespace SearchEngine.Model
 			////this dictionary will be initialized for each document, holds term
 			//Dictionary<string, int> docTerms = new Dictionary<string, int>();
 
-			int wiq;
-			double wij;
-			double idf;
+			int wiq, maxTf;
+			double wij, idf, tfij;
 			double sigmaWijWiq = 0;
 			double sigmaWijSqr = 0;
 			double sigmaWiqSqr = 0;
+			int numOfDocsInEngine = dDocs.Count;
 
 			foreach (QueryDoc qd in queryDocs)
 			{
-
+				maxTf = dDocs[qd.docName].maxtfCount;
 
 				foreach (QueryTerm qt in qd.queryTerm)
 				{
@@ -50,7 +50,9 @@ namespace SearchEngine.Model
 						idf = termsData[qt.term.termString];
 
 					wiq = qt.queryOccurence;
-					wij = idf;// * qt.tf;
+					//term frequency in doc normalized by maxTf in doc
+					tfij = (qt.term.d_docTf[qd.docName]) / maxTf;
+					wij = idf * tfij;
 
 					sigmaWijWiq += wiq * wij;
 					sigmaWijSqr += Math.Pow(wij, 2);

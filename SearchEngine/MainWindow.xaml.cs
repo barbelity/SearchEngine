@@ -124,13 +124,13 @@ namespace SearchEngine
             btn_startParsing.IsEnabled = false;
             btn_loadPosting.IsEnabled = false;
             indexer = new Indexer(postingPath);
+			ranker.postingPath = postingPath;
             parser = new Parse(filesPath, postingPath, indexer, cb_Stemmeing.IsChecked.Value);
             parser.ModelChanged += vModelChanged;
             Thread thread = new Thread(new ThreadStart(parser.startParsing));
             thread.Start();
             btn_runQuery.IsEnabled = true;
             btn_runQueryFile.IsEnabled = true;
-
         }
 
         private void btn_clearPosting_Click(object sender, RoutedEventArgs e)
@@ -233,6 +233,11 @@ namespace SearchEngine
 
             if (txtbx_query.Text != "")
             {
+				ranker.mainIndexList1 = indexer.mainIndexList1;
+				ranker.mainIndexList2 = indexer.mainIndexList2;
+				ranker.mainIndexList3 = indexer.mainIndexList3;
+				ranker.mainIndexList4 = indexer.mainIndexList4;
+				ranker.mainIndexList5 = indexer.mainIndexList5;
                 txtbx_postingDisplay.Text = "";
                 searcher.toMonth = toMonth;
                 searcher.fromMonth = fromMonth;
@@ -261,8 +266,8 @@ namespace SearchEngine
                 MessageBox.Show("Please enter Posting Files path");
                 return;
             }
-
             indexer = new Indexer(postingPath, true);
+			ranker.postingPath = postingPath;
             btn_startParsing.IsEnabled = false;
             btn_loadPosting.IsEnabled = false;
             btn_runQuery.IsEnabled = true;
@@ -296,6 +301,7 @@ namespace SearchEngine
         private bool multiThread;
         string[] queries;
         List<string> result;
+
         private void btn_runQueryFile_Click(object sender, RoutedEventArgs e)
         {
             if (txtbx_postingPath.Text.Length != 0)
@@ -322,6 +328,11 @@ namespace SearchEngine
                     MessageBox.Show("Please add a queries.txt file at posting path");
                     return;
                 }
+				ranker.mainIndexList1 = indexer.mainIndexList1;
+				ranker.mainIndexList2 = indexer.mainIndexList2;
+				ranker.mainIndexList3 = indexer.mainIndexList3;
+				ranker.mainIndexList4 = indexer.mainIndexList4;
+				ranker.mainIndexList5 = indexer.mainIndexList5;
                 t_multiQuery = new Thread(delegate ()
                 {
                     if (File.Exists(postingPath + "\\result.txt"))

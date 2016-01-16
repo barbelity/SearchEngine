@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,7 +12,13 @@ namespace SearchEngine.Model
     class Ranker
     {
 		private Dictionary<string, double> termsData;
+		public string postingPath;
 
+		public SortedList<string, int> mainIndexList1;
+		public SortedList<string, int> mainIndexList2;
+		public SortedList<string, int> mainIndexList3;
+		public SortedList<string, int> mainIndexList4;
+		public SortedList<string, int> mainIndexList5;
 		/// <summary>
 		/// Constructor
 		/// </summary>
@@ -68,9 +77,10 @@ namespace SearchEngine.Model
 				}
 
 				//calculate cosine
-				double cosineDenominator = (double)sigmaWijSqr * (double)sigmaWiqSqr;
-				cosineDenominator = (double)Math.Sqrt(cosineDenominator);
-				double cosine = (double)sigmaWijWiq / (double)cosineDenominator;
+				double docsSigmaWijSqr = CalculateDocsWij(qd.docName, maxTf, numOfDocsInEngine);
+				double cosineDenominator = docsSigmaWijSqr * sigmaWiqSqr;
+				cosineDenominator = Math.Sqrt(cosineDenominator);
+				double cosine = sigmaWijWiq / cosineDenominator;
 				
 				//insert result to docsRanks
 				if (docsRanks.ContainsKey(cosine))
@@ -111,5 +121,51 @@ namespace SearchEngine.Model
 			return ans;
 
 		}
+
+		private double CalculateDocsWij(string docName, int maxTf, int numOfDocsInEngine)
+		{
+			IFormatter formatter = new BinaryFormatter();
+			Dictionary<string, int> d_document = (Dictionary<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\docs\" + docName + @".bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+
+			double idf, tfij, wij;
+			double sigmaWijSqr = 0;
+			int td = 1;
+
+			//calculate sigmaWij for ALL terms in doc
+			foreach (KeyValuePair<string, int> tuple in d_document)
+			{
+				string termString = tuple.Key;
+				//extract term's frequency in docs
+				if (mainIndexList1.ContainsKey(termString))
+					td = mainIndexList1[termString];
+				else if (mainIndexList2.ContainsKey(termString))
+					td = mainIndexList2[termString];
+				else if (mainIndexList3.ContainsKey(termString))
+					td = mainIndexList3[termString];
+				else if (mainIndexList4.ContainsKey(termString))
+					td = mainIndexList4[termString];
+				else if (mainIndexList5.ContainsKey(termString))
+					td = mainIndexList5[termString];
+
+				//get idf value
+				if (!(termsData.ContainsKey(tuple.Key)))
+				{
+					idf = Math.Log((numOfDocsInEngine / td), 2);
+					termsData[tuple.Key] = idf;
+				}
+				else
+					idf = termsData[tuple.Key];
+
+				//calculate wij
+				tfij = (double)tuple.Value / (double)maxTf;
+				wij = tfij * idf;
+
+				//sum sigmaWiSqr
+				sigmaWijSqr += Math.Pow(wij, 2);
+			}
+
+			return sigmaWijSqr;
+		}
+
     }
 }

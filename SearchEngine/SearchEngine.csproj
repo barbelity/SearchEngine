@@ -91,6 +91,7 @@
     <Compile Include="Model\Doc.cs" />
     <Compile Include="Model\Indexer.cs" />
     <Compile Include="Model\Parse.cs" />
+    <Compile Include="Model\QueryTerm.cs" />
     <Compile Include="Model\Ranker.cs" />
     <Compile Include="Model\ReadFile.cs" />
     <Compile Include="Model\Searcher.cs" />

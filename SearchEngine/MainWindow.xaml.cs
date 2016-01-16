@@ -36,7 +36,7 @@ namespace SearchEngine
             searcher = new Searcher(ranker);
 
         }
-        private void vModelChanged(int type, string value)
+        internal static void vModelChanged(int type, string value)
         {
             if (type == 1)
             {
@@ -131,6 +131,8 @@ namespace SearchEngine
                 File.Delete(postingPath + @"\list3.bin");
                 File.Delete(postingPath + @"\list4.bin");
                 File.Delete(postingPath + @"\list5.bin");
+                File.Delete(postingPath + @"\Doc.bin");
+                MessageBox.Show("Posting Files were cleared");
             }
             catch (Exception exp)
             {

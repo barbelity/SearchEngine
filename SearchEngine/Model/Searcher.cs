@@ -31,15 +31,17 @@ namespace SearchEngine.Model
             string[] splitedQuery = query.Split(' ');
             for (int i = 0; i < splitedQuery.Length; i++)
             {
-                if (splitedQuery[i].Contains('%'))
+                string mutableTerm;
+                if (splitedQuery[i][0] =='%' && splitedQuery[i][splitedQuery[i].Length -1] == '%')
                 {
-                    if (mutableQuery.ContainsKey(splitedQuery[i]))
+                    mutableTerm = splitedQuery[i].Substring(1, splitedQuery[i].Length - 2);
+                    if (mutableQuery.ContainsKey(mutableTerm))
                     {
-                        mutableQuery[splitedQuery[i]] += 1;
+                        mutableQuery[mutableTerm] += 1;
                     }
                     else
                     {
-                        mutableQuery[splitedQuery[i]] = 1;
+                        mutableQuery[mutableTerm] = 1;
                     }
                     splitedQuery[i] = "";
                 }
@@ -57,10 +59,14 @@ namespace SearchEngine.Model
             d_queryTerms = new SortedDictionary<string, QueryTerm>();
             Thread[] a_Threads = new Thread[5];
             a_Threads[0] = new Thread(() => getReleventDocs(Parse.d_abNumTerms, indexer.mainIndexList1, "abNumsPosting.txt"));
-            a_Threads[1] = new Thread(() => getReleventDocs(Parse.d_cfTerms, indexer.mainIndexList2, "cfPosting.txt"));
-            a_Threads[2] = new Thread(() => getReleventDocs(Parse.d_gmTerms, indexer.mainIndexList3, "gmPosting.txt"));
-            a_Threads[3] = new Thread(() => getReleventDocs(Parse.d_nrTerms, indexer.mainIndexList4, "nrPosting.txt"));
-            a_Threads[4] = new Thread(() => getReleventDocs(Parse.d_szTerms, indexer.mainIndexList5, "szPosting.txt"));
+            a_Threads[1] = new Thread(() => getReleventDocs(Parse.d_cfTerms, indexer.mainIndexList2,        "cfPosting.txt"));
+            a_Threads[2] = new Thread(() => getReleventDocs(Parse.d_gmTerms, indexer.mainIndexList3,        "gmPosting.txt"));
+            a_Threads[3] = new Thread(() => getReleventDocs(Parse.d_nrTerms, indexer.mainIndexList4,        "nrPosting.txt"));
+            a_Threads[4] = new Thread(() => getReleventDocs(Parse.d_szTerms, indexer.mainIndexList5,        "szPosting.txt"));
+            foreach (Thread t in a_Threads)
+            {
+                t.Start();
+            }
             foreach (Thread t in a_Threads)
             {
                 t.Join();
@@ -79,6 +85,7 @@ namespace SearchEngine.Model
                             l_temp = new List<QueryTerm>();
                             l_temp.Add(stringQTermPair.Value);
                             queryDocs[docNameLocationsPair.Key] = new QueryDoc(docNameLocationsPair.Key, l_temp);
+                            Console.WriteLine(docNameLocationsPair.Key + " doc was added");
                         }
                         else try
                             {
@@ -88,6 +95,7 @@ namespace SearchEngine.Model
                                     l_temp = new List<QueryTerm>();
                                     l_temp.Add(stringQTermPair.Value);
                                     queryDocs[docNameLocationsPair.Key] = new QueryDoc(docNameLocationsPair.Key, l_temp);
+                                    Console.WriteLine(docNameLocationsPair.Key + " doc was added");
                                 }
                             }
                             catch (Exception)
@@ -101,9 +109,11 @@ namespace SearchEngine.Model
                     else
                     {
                         queryDocs[docNameLocationsPair.Key].queryTerm.Add(stringQTermPair.Value);
+                        Console.WriteLine(docNameLocationsPair.Key + " doc has a term added");
                     }
                 }
             }
+            int j = 1;
         }
 
 
@@ -120,8 +130,10 @@ namespace SearchEngine.Model
                     if (dict.ContainsKey(listPair.Key)) // this term in query
                         lock (d_queryTerms)
                         {
-                            d_queryTerms[listPair.Key] = new QueryTerm(getTermFromString(line));
+                            
+                            d_queryTerms[listPair.Key] = new QueryTerm(_indexer.convertPostingStringToTerm(line));
                             d_queryTerms[listPair.Key].td = dict[listPair.Key].d_locations["Query"].ToString().Count(f => f == ',');
+                            Console.WriteLine(d_queryTerms[listPair.Key].term.termString + " mutable term was added");
                         }
                     else if (mutableQuery.Count != 0)//this is a part of term
                         foreach (var pair in mutableQuery)
@@ -129,16 +141,18 @@ namespace SearchEngine.Model
                                 lock (d_queryTerms)
                                     if (!d_queryTerms.ContainsKey(listPair.Key))
                                     {
-                                        d_queryTerms[listPair.Key] = new QueryTerm(getTermFromString(line));
-                                        d_queryTerms[listPair.Key].td = mutableQuery[listPair.Key];
+                                        d_queryTerms[listPair.Key] = new QueryTerm(_indexer.convertPostingStringToTerm(line));
+                                        d_queryTerms[listPair.Key].td = pair.Value;
+                                        Console.WriteLine(d_queryTerms[listPair.Key].term.termString+ " mutable term was added");
+                                    }
+                                    else
+                                    {
+                                        d_queryTerms[listPair.Key].td += pair.Value;
+                                        Console.WriteLine(d_queryTerms[listPair.Key].term.termString + " mutable term was added tf");
                                     }
                 }
             }
         }
 
-        private Term getTermFromString(string line)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -80,10 +80,10 @@ namespace SearchEngine.Model
 
         static Indexer _indexer;
         /// <summary>
-        /// constractor
+        /// constructor
         /// </summary>
         /// <param name="PathData">path to data files</param>
-        /// <param name="indexer">instanc of indexer</param>
+        /// <param name="indexer">instance of indexer</param>
         /// <param name="stemming">yes/no stemming</param>
         public Parse(string PathData, string PathPosting, Indexer indexer, bool stemming)
         {
@@ -91,7 +91,11 @@ namespace SearchEngine.Model
             filesPath = PathData;
             _indexer = indexer;
             StopWords = ReadFile.readStopWords(PathData + @"\stop_words.txt");
-            File.Copy(PathData + @"\stop_words.txt", PathPosting + @"\stop_words.txt");
+            if (!File.Exists(PathPosting + @"\stop_words.txt"))
+            {
+                File.Copy(PathData + @"\stop_words.txt", PathPosting + @"\stop_words.txt");
+            }
+            
             addMonths();
         }
 

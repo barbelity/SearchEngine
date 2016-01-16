@@ -59,16 +59,16 @@ namespace SearchEngine.Model
 
 					wiq = qt.queryOccurence;
 					//term frequency in doc normalized by maxTf in doc
-					tfij = (qt.term.d_docTf[qd.docName]) / maxTf;
+					tfij = (double)(qt.term.d_docTf[qd.docName]) / (double)maxTf;
 					wij = idf * tfij;
 
-					sigmaWijWiq += wiq * wij;
+					sigmaWijWiq += (double)wiq * wij;
 					sigmaWijSqr += Math.Pow(wij, 2);
 					sigmaWiqSqr += Math.Pow(wiq, 2);
 				}
 
 				//calculate cosine
-				double cosineDenominator = sigmaWijSqr + sigmaWiqSqr;
+				double cosineDenominator = sigmaWijSqr * sigmaWiqSqr;
 				cosineDenominator = Math.Sqrt(cosineDenominator);
 				double cosine = sigmaWijWiq / cosineDenominator;
 				
@@ -95,7 +95,7 @@ namespace SearchEngine.Model
 			KeyValuePair<double, List<string>> docList;
 			for (int i = docsRanks.Count - 1; i >= 0; i-- )
 			{
-				if (resultsCount > 50)
+				if (resultsCount == 50)
 					break;
 
 				docList = docsRanks.ElementAt(i);
@@ -103,7 +103,7 @@ namespace SearchEngine.Model
 				{
 					ans.Add(doc);
 					resultsCount++;
-					if (resultsCount > 50)
+					if (resultsCount == 50)
 						break;
 				}
 			}

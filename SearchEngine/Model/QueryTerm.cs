@@ -12,8 +12,6 @@ namespace SearchEngine.Model
        //related term
 		public Term term { get; set; }
 
-		//occurences in current document
-		public int tf { get; set; }
 
 		//number of docs this term exists
 		public int td { get; set; }
@@ -22,13 +20,21 @@ namespace SearchEngine.Model
 		public int queryOccurence { get; set; }
 
 
-		public QueryTerm(Term term, int tf, int td, int queryOccurence)
+		public QueryTerm(Term term, int td, int queryOccurence)
 		{
 			this.term = term;
-			this.tf = tf;
+
 			this.td = td;
 			this.queryOccurence = queryOccurence;
 		}
 
-	}
+        public QueryTerm(Term term)
+        {
+            this.term = term;
+
+            this.td = 0;
+            this.queryOccurence = 1;
+        }
+
+    }
 }

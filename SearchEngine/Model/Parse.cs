@@ -265,8 +265,8 @@ namespace SearchEngine.Model
             numOfTerms += getTerms(ref text, priceReg, "Price", docName);
             numOfTerms += getTerms(ref text, numReg, "Number", docName);
             numOfTerms += getTerms(ref text, namesReg, "Name", docName);
-            numOfTerms += getTerms(ref text, quoteRegex, "Quote", docName);
-            numOfTerms += getTerms(ref text, capsRegex, "CapsHeadline", docName);
+            //numOfTerms += getTerms(ref text, quoteRegex, "Quote", docName);
+            //numOfTerms += getTerms(ref text, capsRegex, "CapsHeadline", docName);
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
             //update numOfTerms - if we put it in constructor of doc it saves time
             doc.termsCount = numOfTerms;

@@ -19,7 +19,7 @@ namespace SearchEngine.Model
 
         StreamReader postingReader;
         StreamWriter tempWriter;
-        string postingPath;
+        internal string postingPath;
 		
 		/// <summary>
 		/// Constructor

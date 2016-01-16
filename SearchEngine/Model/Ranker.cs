@@ -34,8 +34,8 @@ namespace SearchEngine.Model
 			////this dictionary will be initialized for each document, holds term
 			//Dictionary<string, int> docTerms = new Dictionary<string, int>();
 
-			int wiq, maxTf;
-			double wij, idf, tfij;
+			int maxTf;
+			double wij, idf, tfij, wiq;
 			double sigmaWijWiq = 0;
 			double sigmaWijSqr = 0;
 			double sigmaWiqSqr = 0;
@@ -57,7 +57,7 @@ namespace SearchEngine.Model
 					else
 						idf = termsData[qt.term.termString];
 
-					wiq = qt.queryOccurence;
+					wiq = (double)qt.queryOccurence / (double)2;
 					//term frequency in doc normalized by maxTf in doc
 					tfij = (double)(qt.term.d_docTf[qd.docName]) / (double)maxTf;
 					wij = idf * tfij;

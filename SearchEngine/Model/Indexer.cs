@@ -216,5 +216,67 @@ namespace SearchEngine.Model
             ans += mainIndexList5.Count;
             return ans;
         }
+
+
+		public Term convertPostingStringToTerm(string line)
+		{
+			Term result = new Term();
+			string termString;
+			//string type;
+			Dictionary<string, StringBuilder> dLocations = new Dictionary<string, StringBuilder>();
+			Dictionary<string, int> dDocTf = new Dictionary<string, int>();
+
+			//extract term string
+			int termEndIndex = line.IndexOf('@');
+			termString = line.Substring(0, termEndIndex);
+			//cut the term string
+			line = line.Substring(termEndIndex + 1);
+
+			//extract documents and positions
+			string[] docsDivisionArray = line.Split('|');
+
+			foreach (string docString in docsDivisionArray)
+			{
+				if (docString.Length < 1)
+					continue;
+				int currLoc, docTf;//, tfCount = 0;
+				string docName;
+				StringBuilder sb = new StringBuilder();
+
+				//extracting the docName
+				currLoc = docString.IndexOf(';');
+				docName = docString.Substring(0, currLoc);
+				//removing docName
+				string docLocationsString = docString.Substring(currLoc + 1);
+
+				//extracting docTf
+				currLoc = docLocationsString.IndexOf(':');
+				docTf = Int32.Parse(docLocationsString.Substring(0, currLoc));
+				//removing docTf
+				docLocationsString = docLocationsString.Substring(currLoc + 1);
+
+				string[] locationsDivisionArray = docLocationsString.Split(',');
+
+				//iterating over locations
+				foreach (string locString in locationsDivisionArray)
+				{
+					if (locString.Length < 1)
+						continue;
+					sb.Append(locString + ",");
+					//tfCount++;
+				}
+
+				//updating dLocations and dDocTf with data
+				dLocations[docName] = sb;
+				dDocTf[docName] = docTf;
+
+			}
+
+			result.termString = termString;
+			result.d_locations = dLocations;
+			result.d_docTf = dDocTf;
+
+			return result;
+		}
     }
 }

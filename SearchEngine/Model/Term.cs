@@ -21,6 +21,12 @@ namespace SearchEngine.Model
             this.termString = termString;
         }
 
+		public Term()
+		{
+			d_locations = new Dictionary<string, StringBuilder>();
+			d_docTf = new Dictionary<string, int>();
+		}
+
         public override int GetHashCode()
         {
             return termString.GetHashCode();

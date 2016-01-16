@@ -50,7 +50,7 @@ namespace SearchEngine.Model
 						idf = termsData[qt.term.termString];
 
 					wiq = qt.queryOccurence;
-					wij = idf * qt.tf;
+					wij = idf;// * qt.tf;
 
 					sigmaWijWiq += wiq * wij;
 					sigmaWijSqr += Math.Pow(wij, 2);

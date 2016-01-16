@@ -15,6 +15,7 @@ namespace SearchEngine.Model
         Indexer _indexer;
         Dictionary<string, int> mutableQuery;
         SortedDictionary<string, QueryTerm> d_queryTerms;
+        Dictionary<string, QueryDoc> queryDocs;
 
 
 
@@ -56,13 +57,52 @@ namespace SearchEngine.Model
             d_queryTerms = new SortedDictionary<string, QueryTerm>();
             Thread[] a_Threads = new Thread[5];
             a_Threads[0] = new Thread(() => getReleventDocs(Parse.d_abNumTerms, indexer.mainIndexList1, "abNumsPosting.txt"));
-            a_Threads[1] = new Thread(() => getReleventDocs(Parse.d_cfTerms, indexer.mainIndexList2, "cfPosting.txt"       ));
-            a_Threads[2] = new Thread(() => getReleventDocs(Parse.d_gmTerms, indexer.mainIndexList3, "gmPosting.txt"       ));
-            a_Threads[3] = new Thread(() => getReleventDocs(Parse.d_nrTerms, indexer.mainIndexList4, "nrPosting.txt"       ));
-            a_Threads[4] = new Thread(() => getReleventDocs(Parse.d_szTerms, indexer.mainIndexList5, "szPosting.txt"       ));
+            a_Threads[1] = new Thread(() => getReleventDocs(Parse.d_cfTerms, indexer.mainIndexList2, "cfPosting.txt"));
+            a_Threads[2] = new Thread(() => getReleventDocs(Parse.d_gmTerms, indexer.mainIndexList3, "gmPosting.txt"));
+            a_Threads[3] = new Thread(() => getReleventDocs(Parse.d_nrTerms, indexer.mainIndexList4, "nrPosting.txt"));
+            a_Threads[4] = new Thread(() => getReleventDocs(Parse.d_szTerms, indexer.mainIndexList5, "szPosting.txt"));
             foreach (Thread t in a_Threads)
             {
                 t.Join();
+            }
+            //remove irrelevant dates and creates queryDocs list
+            queryDocs = new Dictionary<string, QueryDoc>();
+            List<QueryTerm> l_temp;
+            foreach (var stringQTermPair in d_queryTerms)
+            {
+                foreach (var docNameLocationsPair in stringQTermPair.Value.term.d_locations)
+                {
+                    if (!queryDocs.ContainsKey(docNameLocationsPair.Key))
+                    {
+                        if (Parse.d_docs[docNameLocationsPair.Key].date.Length < 5)//no date
+                        {
+                            l_temp = new List<QueryTerm>();
+                            l_temp.Add(stringQTermPair.Value);
+                            queryDocs[docNameLocationsPair.Key] = new QueryDoc(docNameLocationsPair.Key, l_temp);
+                        }
+                        else try
+                            {
+                                DateTime date = Convert.ToDateTime(Parse.d_docs[docNameLocationsPair.Key].date);
+                                if ((toMonth == 0 || date.Month <= toMonth) && date.Month >= fromMonth)
+                                {
+                                    l_temp = new List<QueryTerm>();
+                                    l_temp.Add(stringQTermPair.Value);
+                                    queryDocs[docNameLocationsPair.Key] = new QueryDoc(docNameLocationsPair.Key, l_temp);
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                l_temp = new List<QueryTerm>();
+                                l_temp.Add(stringQTermPair.Value);
+                                queryDocs[docNameLocationsPair.Key] = new QueryDoc(docNameLocationsPair.Key, l_temp);
+                                throw;
+                            }
+                    }
+                    else
+                    {
+                        queryDocs[docNameLocationsPair.Key].queryTerm.Add(stringQTermPair.Value);
+                    }
+                }
             }
         }
 

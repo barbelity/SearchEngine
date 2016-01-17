@@ -372,6 +372,7 @@ namespace SearchEngine.Model
 				sigmaWijSqr += Math.Pow(wij, 2);
 			}
 
+			File.Delete(postingPath + @"\docs\" + docName + @".bin");
 			return sigmaWijSqr;
 		}
     }

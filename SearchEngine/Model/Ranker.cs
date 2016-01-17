@@ -46,7 +46,7 @@ namespace SearchEngine.Model
 			int maxTf;
 			double wij, idf, tfij, wiq;
 			double sigmaWijWiq = 0;
-			double sigmaWijSqr = 0;
+			//double sigmaWijSqr = 0;
 			double sigmaWiqSqr = 0;
 			int numOfDocsInEngine = dDocs.Count;
 
@@ -66,18 +66,22 @@ namespace SearchEngine.Model
 					else
 						idf = termsData[qt.term.termString];
 
-					wiq = (double)qt.queryOccurence / (double)2;
+
+					wiq = 1;
+					//wiq = (double)qt.queryOccurence / (double)2;
+
+
 					//term frequency in doc normalized by maxTf in doc
 					tfij = (double)(qt.term.d_docTf[qd.docName]) / (double)maxTf;
 					wij = idf * tfij;
 
 					sigmaWijWiq += (double)wiq * wij;
-					sigmaWijSqr += Math.Pow(wij, 2);
+					//sigmaWijSqr += Math.Pow(wij, 2);
 					sigmaWiqSqr += Math.Pow(wiq, 2);
 				}
 
 				//calculate cosine
-				double docsSigmaWijSqr = CalculateDocsWij(qd.docName, maxTf, numOfDocsInEngine);
+				double docsSigmaWijSqr = dDocs[qd.docName].sigmaWijSqr; //double docsSigmaWijSqr = CalculateDocsWij(qd.docName, maxTf, numOfDocsInEngine);
 				double cosineDenominator = docsSigmaWijSqr * sigmaWiqSqr;
 				cosineDenominator = Math.Sqrt(cosineDenominator);
 				double cosine = sigmaWijWiq / cosineDenominator;
@@ -96,7 +100,7 @@ namespace SearchEngine.Model
 				//docRanks[qd.docName] = cosine;
 
 				sigmaWijWiq = 0;
-				sigmaWijSqr = 0;
+				//sigmaWijSqr = 0;
 				sigmaWiqSqr = 0;
 			}
 
@@ -122,6 +126,7 @@ namespace SearchEngine.Model
 
 		}
 
+		/*
 		private double CalculateDocsWij(string docName, int maxTf, int numOfDocsInEngine)
 		{
 			IFormatter formatter = new BinaryFormatter();
@@ -166,6 +171,6 @@ namespace SearchEngine.Model
 
 			return sigmaWijSqr;
 		}
-
+		*/
     }
 }

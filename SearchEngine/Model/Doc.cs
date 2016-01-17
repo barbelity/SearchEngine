@@ -16,6 +16,7 @@ namespace SearchEngine.Model
         public string docName { get; set; }
         public string date { get; set; }
 		public int termsCount { get; set; }
+		public double sigmaWijSqr { get; set; }
 
 
         public Doc(string docName, string date)

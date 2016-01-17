@@ -20,6 +20,8 @@ namespace SearchEngine.Model
         StreamReader postingReader;
         StreamWriter tempWriter;
         internal string postingPath;
+
+		private Dictionary<string, double> termsData;
 		
 		/// <summary>
 		/// Constructor
@@ -33,6 +35,7 @@ namespace SearchEngine.Model
 			mainIndexList3 = new SortedList<string, int>();
 			mainIndexList4 = new SortedList<string, int>();
 			mainIndexList5 = new SortedList<string, int>();
+			termsData = new Dictionary<string, double>();
         }
 
 		/// <summary>
@@ -44,6 +47,7 @@ namespace SearchEngine.Model
         {
             this.postingPath = postingPath;
             IFormatter formatter = new BinaryFormatter();
+			termsData = new Dictionary<string, double>();
 
             try
             {
@@ -286,6 +290,76 @@ namespace SearchEngine.Model
 			result.d_docTf = dDocTf;
 
 			return result;
+		}
+
+		/// <summary>
+		/// updates d_docs with Wij calculation for each doc
+		/// </summary>
+		internal void calculatDocumentsData()
+		{
+			int numOfDocs = Parse.d_docs.Count;
+			double sigmaWijSqr = 0;
+
+			foreach (KeyValuePair<string, Doc> doc in Parse.d_docs)
+			{
+				sigmaWijSqr = CalculateDocsWij(doc.Key, doc.Value.maxtfCount, numOfDocs);
+				Parse.d_docs[doc.Key].sigmaWijSqr = sigmaWijSqr;
+			}
+			IFormatter formatter = new BinaryFormatter();
+			formatter.Serialize(new FileStream(postingPath + @"\newDoc.bin", FileMode.Create, FileAccess.Write, FileShare.None), Parse.d_docs);
+		}
+
+		/// <summary>
+		/// calculates sigmaWijSqr for a requested doc
+		/// </summary>
+		/// <param name="docName">name of document</param>
+		/// <param name="maxTf">maxTf in document</param>
+		/// <param name="numOfDocsInEngine">total documents in the engine</param>
+		/// <returns>calculated sigmaWijSqr</returns>
+		private double CalculateDocsWij(string docName, int maxTf, int numOfDocsInEngine)
+		{
+			IFormatter formatter = new BinaryFormatter();
+			Dictionary<string, int> d_document = (Dictionary<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\docs\" + docName + @".bin", FileMode.Open, FileAccess.Read, FileShare.Read));
+
+			double idf, tfij, wij;
+			double sigmaWijSqr = 0;
+			int td = 1;
+
+			//calculate sigmaWij for ALL terms in doc
+			foreach (KeyValuePair<string, int> tuple in d_document)
+			{
+				string termString = tuple.Key;
+				//extract term's frequency in docs
+				
+				if (mainIndexList1.ContainsKey(termString))
+					td = mainIndexList1[termString];
+				else if (mainIndexList2.ContainsKey(termString))
+					td = mainIndexList2[termString];
+				else if (mainIndexList3.ContainsKey(termString))
+					td = mainIndexList3[termString];
+				else if (mainIndexList4.ContainsKey(termString))
+					td = mainIndexList4[termString];
+				else if (mainIndexList5.ContainsKey(termString))
+					td = mainIndexList5[termString];
+				
+				//get idf value
+				if (!(termsData.ContainsKey(tuple.Key)))
+				{
+					idf = Math.Log((numOfDocsInEngine / td), 2);
+					termsData[tuple.Key] = idf;
+				}
+				else
+					idf = termsData[tuple.Key];
+
+				//calculate wij
+				tfij = (double)tuple.Value / (double)maxTf;
+				wij = tfij * idf;
+
+				//sum sigmaWiSqr
+				sigmaWijSqr += Math.Pow(wij, 2);
+			}
+
+			return sigmaWijSqr;
 		}
     }
 }

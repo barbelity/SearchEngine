@@ -191,6 +191,10 @@ namespace SearchEngine.Model
             d_szTerms = null;
             //save all list data for import
             _indexer.saveLists();
+
+			//calculate data for all documents
+			_indexer.calculatDocumentsData();
+
             float time = (DateTime.Now.Minute * 60 + DateTime.Now.Second - start.Minute * 60 - start.Second) / 60;
             int numOfTerms = _indexer.getNumOfTerms();
             ModelChanged(1, "Finshed parsing and indexing docs after " + time + " min\n" + "Number of Docs: " + d_docs.Count + "\nNumber of Terms: " + numOfTerms);
@@ -238,6 +242,7 @@ namespace SearchEngine.Model
         
         /// <summary>
         /// parse a singel doc for ThreadParsing
+        /// parse a single doc for ThreadParsing
         /// </summary>
         /// <param name="docRaw"></param>
         static public void parseDoc(string docRaw)

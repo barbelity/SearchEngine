@@ -53,7 +53,8 @@ namespace SearchEngine.Model
             foreach (var pair in d_locations)
             {
                 tfCount = pair.Value.ToString();
-                tempAns.Append(pair.Key + ";" + tfCount.Count(x => x == ',') + ":");
+                //tempAns.Append(pair.Key + ";" + tfCount.Count(x => x == ',') + ":");
+				tempAns.Append(pair.Key + ";" + d_docTf[pair.Key] + ":");
                 tempAns.Append(pair.Value);
                 tempAns.Append('|');
                 tfCount += pair.Key + ";";

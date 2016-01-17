@@ -259,9 +259,16 @@ namespace SearchEngine.Model
             else
                 doc = new Doc(docName);
 
+            int headLineStartIdx = split[0].IndexOf("<TI>");
+            string Header = "";
+            if (dateStartIdx > 0)
+            {
+                 Header = split[0].Substring(headLineStartIdx + 4, split[0].IndexOf("</TI>") - headLineStartIdx - 5);
+            }
+
             split = split[1].Split(new string[] { "</TEXT>" }, StringSplitOptions.None);
             string text = split[0];
-
+            doc.Header = Header;
             doc.d_TermsCount = new Dictionary<string, int>();
             lock (d_docs)
             {
@@ -281,6 +288,7 @@ namespace SearchEngine.Model
             //numOfTerms += getTerms(ref text, quoteRegex, "Quote", docName);
             //numOfTerms += getTerms(ref text, capsRegex, "CapsHeadline", docName);
             numOfTerms += getTerms(ref text, wordRegex, "Word", docName);
+            numOfTerms += getTerms(ref Header, wordRegex, "Header", docName);
             //update numOfTerms - if we put it in constructor of doc it saves time
             doc.termsCount = numOfTerms;
             using (FileStream fs = new FileStream(postingPath + @"\docs\" + doc.docName +".bin", FileMode.Create, FileAccess.Write, FileShare.None))
@@ -354,7 +362,7 @@ namespace SearchEngine.Model
                 if (StopWords.ContainsKey(termString) || termString.Length <= 0)
                     continue;
 
-                if (!(type[0] == 'W') && !(type[0] == 'N') && !(type[0] == 'Q') && !(type[0] == 'C'))
+                if (!(type[0] == 'W') && !(type[0] == 'N') && !(type[0] == 'Q') && !(type[0] == 'C') && !(type[0] == 'H'))
                 {
                     string clearTerm = new String('#', term.Length - 2);
                     text = text.Substring(0, term.Index) + " " + clearTerm + " " + text.Substring(term.Index + term.Length);
@@ -501,6 +509,10 @@ namespace SearchEngine.Model
                             }
                         }
 
+                        if (type == "Header")
+                        {
+                            int j = 1;
+                        }
 
                         //insert to correct dictionary
                         if (termString[0] >= 's')

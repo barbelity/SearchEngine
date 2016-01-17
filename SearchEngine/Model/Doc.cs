@@ -16,7 +16,7 @@ namespace SearchEngine.Model
         public string docName { get; set; }
         public string date { get; set; }
 		public int termsCount { get; set; }
-
+        public string Header { get; internal set; }
 
         public Doc(string docName, string date)
         {

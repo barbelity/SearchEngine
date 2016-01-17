@@ -72,13 +72,18 @@ namespace SearchEngine.Model
 					//term frequency in doc normalized by maxTf in doc
 					tfij = (double)(qt.term.d_docTf[qd.docName]) / (double)maxTf;
 
-					wij = idf * tfij;
+					if (qt.term.d_docHeader[qd.docName] == true)
+						tfij *= 1.2;
 
+					wij = idf * tfij;
+					/*
 					//add more weight if term exists in header
-					if (qt.term.d_docHeader.ContainsKey(qd.docName))
+					if (qt.term.d_docHeader[qd.docName] == true)
 						sigmaWijWiq += ((double)wiq * wij) * 1.2;
 					else
 						sigmaWijWiq += (double)wiq * wij;
+					 * */
+					sigmaWijWiq += (double)wiq * wij;
 					//sigmaWijWiq += (double)wiq * wij;
 					//sigmaWijSqr += Math.Pow(wij, 2);
 					sigmaWiqSqr += Math.Pow(wiq, 2);

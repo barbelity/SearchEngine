@@ -39,6 +39,8 @@ namespace SearchEngine.Model
 			List<string> ans = new List<string>();
 			SortedList<double, List<string>> docsRanks = new SortedList<double, List<string>>();
 
+			//calculates number of terms in query
+			int termsInQuery = Parse.d_abNumTerms.Count + Parse.d_cfTerms.Count + Parse.d_gmTerms.Count + Parse.d_nrTerms.Count + Parse.d_szTerms.Count;
 			//Dictionary<string, double> docRanks = new Dictionary<string, double>();
 			////this dictionary will be initialized for each document, holds term
 			//Dictionary<string, int> docTerms = new Dictionary<string, int>();
@@ -67,40 +69,29 @@ namespace SearchEngine.Model
 						idf = termsData[qt.term.termString];
 
 					wiq = 1;
-					//wiq = (double)qt.queryOccurence / (double)2;
 
 					//term frequency in doc normalized by maxTf in doc
 					tfij = (double)(qt.term.d_docTf[qd.docName]) / (double)maxTf;
 
+					//mult tfij by 1.2 if term appears in doc's header
 					if (qt.term.d_docHeader[qd.docName] == true)
 						tfij *= 1.2;
 
 					wij = idf * tfij;
-					/*
-					//add more weight if term exists in header
-					if (qt.term.d_docHeader[qd.docName] == true)
-						sigmaWijWiq += ((double)wiq * wij) * 1.2;
-					else
-						sigmaWijWiq += (double)wiq * wij;
-					 * */
+
 					sigmaWijWiq += (double)wiq * wij;
-					//sigmaWijWiq += (double)wiq * wij;
-					//sigmaWijSqr += Math.Pow(wij, 2);
 					sigmaWiqSqr += Math.Pow(wiq, 2);
 				}
 
 
 				//calculate cosine
-				double docsSigmaWijSqr = dDocs[qd.docName].sigmaWijSqr; //double docsSigmaWijSqr = CalculateDocsWij(qd.docName, maxTf, numOfDocsInEngine);
+				double docsSigmaWijSqr = dDocs[qd.docName].sigmaWijSqr;
 				double cosineDenominator = docsSigmaWijSqr * sigmaWiqSqr;
 				cosineDenominator = Math.Sqrt(cosineDenominator);
+				if (termsInQuery == qd.queryTerm.Count)
+					sigmaWijWiq *= 1.2;
 				double cosine = sigmaWijWiq / cosineDenominator;
-				//adders
-				//add 0.2 if appears in header
 
-				//add 0.1 if all query terms appear
-
-				
 				//insert result to docsRanks
 				if (docsRanks.ContainsKey(cosine))
 				{
@@ -112,10 +103,8 @@ namespace SearchEngine.Model
 					toAdd.Add(qd.docName);
 					docsRanks.Add(cosine, toAdd);
 				}
-				//docRanks[qd.docName] = cosine;
 
 				sigmaWijWiq = 0;
-				//sigmaWijSqr = 0;
 				sigmaWiqSqr = 0;
 			}
 
@@ -141,51 +130,5 @@ namespace SearchEngine.Model
 
 		}
 
-		/*
-		private double CalculateDocsWij(string docName, int maxTf, int numOfDocsInEngine)
-		{
-			IFormatter formatter = new BinaryFormatter();
-			Dictionary<string, int> d_document = (Dictionary<string, int>)formatter.Deserialize(new FileStream(postingPath + @"\docs\" + docName + @".bin", FileMode.Open, FileAccess.Read, FileShare.Read));
-
-			double idf, tfij, wij;
-			double sigmaWijSqr = 0;
-			int td = 1;
-
-			//calculate sigmaWij for ALL terms in doc
-			foreach (KeyValuePair<string, int> tuple in d_document)
-			{
-				string termString = tuple.Key;
-				//extract term's frequency in docs
-				if (mainIndexList1.ContainsKey(termString))
-					td = mainIndexList1[termString];
-				else if (mainIndexList2.ContainsKey(termString))
-					td = mainIndexList2[termString];
-				else if (mainIndexList3.ContainsKey(termString))
-					td = mainIndexList3[termString];
-				else if (mainIndexList4.ContainsKey(termString))
-					td = mainIndexList4[termString];
-				else if (mainIndexList5.ContainsKey(termString))
-					td = mainIndexList5[termString];
-
-				//get idf value
-				if (!(termsData.ContainsKey(tuple.Key)))
-				{
-					idf = Math.Log((numOfDocsInEngine / td), 2);
-					termsData[tuple.Key] = idf;
-				}
-				else
-					idf = termsData[tuple.Key];
-
-				//calculate wij
-				tfij = (double)tuple.Value / (double)maxTf;
-				wij = tfij * idf;
-
-				//sum sigmaWiSqr
-				sigmaWijSqr += Math.Pow(wij, 2);
-			}
-
-			return sigmaWijSqr;
-		}
-		*/
     }
 }

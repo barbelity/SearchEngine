@@ -266,7 +266,7 @@ namespace SearchEngine.Model
 
             int headLineStartIdx = split[0].IndexOf("<TI>");
             string Header = "";
-            if (dateStartIdx > 0)
+            if (headLineStartIdx > 0)
             {
                  Header = split[0].Substring(headLineStartIdx + 4, split[0].IndexOf("</TI>") - headLineStartIdx - 5);
             }

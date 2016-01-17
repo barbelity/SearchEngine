@@ -84,6 +84,11 @@ namespace SearchEngine.Model
 				double cosineDenominator = docsSigmaWijSqr * sigmaWiqSqr;
 				cosineDenominator = Math.Sqrt(cosineDenominator);
 				double cosine = sigmaWijWiq / cosineDenominator;
+				//adders
+				//add 0.2 if appears in header
+
+				//add 0.1 if all query terms appear
+
 				
 				//insert result to docsRanks
 				if (docsRanks.ContainsKey(cosine))

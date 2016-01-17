@@ -323,12 +323,13 @@ namespace SearchEngine.Model
                     d_terms[term] = new Term(type, term);
                     numOfTerms++;
                 }
-                if (type[0] == 'H')
+                if (type[0] != 'H')
                 {
                     d_terms[term].addPosition(docName, index);
                 }
                 else
                 {
+					d_terms[term].addPosition(docName, index);
                     d_terms[term].d_docHeader[docName] = true;
                 }
                 

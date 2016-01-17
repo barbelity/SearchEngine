@@ -79,7 +79,6 @@ namespace SearchEngine.Model
 
 					wij = idf * tfij;
 
-<<<<<<< HEAD
 					//add more weight if term exists in header
 					if (qt.term.d_docHeader.ContainsKey(qd.docName))
 						sigmaWijWiq += ((double)wiq * wij) * 1.1;
@@ -87,9 +86,9 @@ namespace SearchEngine.Model
 						sigmaWijWiq += (double)wiq * wij;
 					//sigmaWijWiq += (double)wiq * wij;
 					//sigmaWijSqr += Math.Pow(wij, 2);
-=======
+
 					sigmaWijWiq += (double)wiq * wij;
->>>>>>> origin/master
+
 					sigmaWiqSqr += Math.Pow(wiq, 2);
 				}
 

@@ -371,19 +371,19 @@ namespace SearchEngine.Model
 				//sum sigmaWiSqr
 				sigmaWijSqr += Math.Pow(wij, 2);
 			}
-<<<<<<< HEAD
+
             //if (File.Exists(postingPath + @"\docs\" + docName + @".bin"))
            // {
             //    File.Delete(postingPath + @"\docs\" + docName + @".bin");
            // }
 			
-=======
+
 /*            if (File.Exists(postingPath + @"\docs\" + docName + @".bin"))
             {
                 File.Delete(postingPath + @"\docs\" + docName + @".bin");
             }
 			*/
->>>>>>> origin/master
+
 			return sigmaWijSqr;
 		}
     }

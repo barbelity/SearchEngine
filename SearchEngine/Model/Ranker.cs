@@ -66,9 +66,10 @@ namespace SearchEngine.Model
 					else
 						idf = termsData[qt.term.termString];
 
-					wiq = (double)qt.queryOccurence / (double)2;
-					//term frequency in doc normalized by maxTf in doc
-					tfij = (double)(qt.term.d_docTf[qd.docName]) / (double)maxTf;
+                    //wiq = (double)qt.queryOccurence / (double)2;
+                    wiq = 1;
+                    //term frequency in doc normalized by maxTf in doc
+                    tfij = (double)(qt.term.d_docTf[qd.docName]) / (double)maxTf;
 					wij = idf * tfij;
 
 					sigmaWijWiq += (double)wiq * wij;

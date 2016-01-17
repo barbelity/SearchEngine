@@ -318,7 +318,15 @@ namespace SearchEngine.Model
                     d_terms[term] = new Term(type, term);
                     numOfTerms++;
                 }
-                d_terms[term].addPosition(docName, index);
+                if (type[0] == 'H')
+                {
+                    d_terms[term].addPosition(docName, index);
+                }
+                else
+                {
+                    d_terms[term].d_docHeader[docName] = true;
+                }
+                
             }
             int tfDoc;
             // change max tf in doc if needed

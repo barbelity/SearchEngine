@@ -74,10 +74,16 @@ namespace SearchEngine.Model
 
 					wij = idf * tfij;
 
-					sigmaWijWiq += (double)wiq * wij;
+					//add more weight if term exists in header
+					if (qt.term.d_docHeader.ContainsKey(qd.docName))
+						sigmaWijWiq += ((double)wiq * wij) * 1.2;
+					else
+						sigmaWijWiq += (double)wiq * wij;
+					//sigmaWijWiq += (double)wiq * wij;
 					//sigmaWijSqr += Math.Pow(wij, 2);
 					sigmaWiqSqr += Math.Pow(wiq, 2);
 				}
+
 
 				//calculate cosine
 				double docsSigmaWijSqr = dDocs[qd.docName].sigmaWijSqr; //double docsSigmaWijSqr = CalculateDocsWij(qd.docName, maxTf, numOfDocsInEngine);

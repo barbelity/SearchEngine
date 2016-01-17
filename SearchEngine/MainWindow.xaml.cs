@@ -111,9 +111,9 @@ namespace SearchEngine
                 File.Create(postingPath + @"\gmPosting.txt").Dispose();
                 File.Create(postingPath + @"\nrPosting.txt").Dispose();
                 File.Create(postingPath + @"\szPosting.txt").Dispose();
-                //if (!Directory.Exists(postingPath + @"\docs\"))
-                  //  Directory.Delete(postingPath + @"\docs\");
-                Directory.CreateDirectory(postingPath + @"\docs\");
+                if (Directory.Exists(postingPath + @"\docs"))
+                    Directory.Delete(postingPath + @"\docs");
+                Directory.CreateDirectory(postingPath + @"\docs");
             }
             catch (Exception exp)
             {

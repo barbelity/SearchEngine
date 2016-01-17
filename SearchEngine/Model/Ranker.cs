@@ -76,7 +76,7 @@ namespace SearchEngine.Model
 
 					//add more weight if term exists in header
 					if (qt.term.d_docHeader.ContainsKey(qd.docName))
-						sigmaWijWiq += ((double)wiq * wij) * 1.2;
+						sigmaWijWiq += ((double)wiq * wij) * 1.1;
 					else
 						sigmaWijWiq += (double)wiq * wij;
 					//sigmaWijWiq += (double)wiq * wij;

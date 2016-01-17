@@ -371,10 +371,10 @@ namespace SearchEngine.Model
 				//sum sigmaWiSqr
 				sigmaWijSqr += Math.Pow(wij, 2);
 			}
-            if (File.Exists(postingPath + @"\docs\" + docName + @".bin"))
-            {
-                File.Delete(postingPath + @"\docs\" + docName + @".bin");
-            }
+            //if (File.Exists(postingPath + @"\docs\" + docName + @".bin"))
+           // {
+            //    File.Delete(postingPath + @"\docs\" + docName + @".bin");
+           // }
 			
 			return sigmaWijSqr;
 		}

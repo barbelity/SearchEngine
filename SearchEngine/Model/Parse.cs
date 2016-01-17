@@ -189,11 +189,11 @@ namespace SearchEngine.Model
             d_gmTerms = null;
             d_nrTerms = null;
             d_szTerms = null;
-            //save all list data for import
-            _indexer.saveLists();
 
 			//calculate data for all documents
 			_indexer.calculatDocumentsData();
+			//save all list data for import
+            _indexer.saveLists();
 
             float time = (DateTime.Now.Minute * 60 + DateTime.Now.Second - start.Minute * 60 - start.Second) / 60;
             int numOfTerms = _indexer.getNumOfTerms();

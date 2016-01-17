@@ -238,6 +238,7 @@ namespace SearchEngine.Model
 			//string type;
 			Dictionary<string, StringBuilder> dLocations = new Dictionary<string, StringBuilder>();
 			Dictionary<string, int> dDocTf = new Dictionary<string, int>();
+			Dictionary<string, bool> dDocHeader = new Dictionary<string, bool>();
 
 			//extract term string
 			int termEndIndex = line.IndexOf('@');
@@ -254,6 +255,7 @@ namespace SearchEngine.Model
 					continue;
 				int currLoc, docTf;//, tfCount = 0;
 				string docName;
+				Boolean isHeader;
 				StringBuilder sb = new StringBuilder();
 
 				//extracting the docName
@@ -261,6 +263,16 @@ namespace SearchEngine.Model
 				docName = docString.Substring(0, currLoc);
 				//removing docName
 				string docLocationsString = docString.Substring(currLoc + 1);
+
+				//extracting isHeader
+				currLoc = docLocationsString.IndexOf('&');
+				string tempHeader = docLocationsString.Substring(0, currLoc);
+				if (tempHeader == "H")
+					isHeader = true;
+				else
+					isHeader = false;
+				//removing isHeader
+				docLocationsString = docLocationsString.Substring(currLoc + 1);
 
 				//extracting docTf
 				currLoc = docLocationsString.IndexOf(':');
@@ -282,12 +294,13 @@ namespace SearchEngine.Model
 				//updating dLocations and dDocTf with data
 				dLocations[docName] = sb;
 				dDocTf[docName] = docTf;
-
+				dDocHeader[docName] = isHeader;
 			}
 
 			result.termString = termString;
 			result.d_locations = dLocations;
 			result.d_docTf = dDocTf;
+			result.d_docHeader = dDocHeader;
 
 			return result;
 		}

@@ -20,6 +20,8 @@ namespace SearchEngine.Model
             d_locations = new Dictionary<string, StringBuilder>();
             this.type = type;
             this.termString = termString;
+			d_docHeader = new Dictionary<string, bool>();
+			d_docTf = new Dictionary<string, int>();
         }
 
 		public Term()
@@ -50,13 +52,19 @@ namespace SearchEngine.Model
         public override string ToString()
         {
             string tfCount = "";
+			string isHeader = "";
 
             StringBuilder tempAns = new StringBuilder();
             foreach (var pair in d_locations)
             {
                 tfCount = pair.Value.ToString();
-                //tempAns.Append(pair.Key + ";" + tfCount.Count(x => x == ',') + ":");
-				tempAns.Append(pair.Key + ";" + d_docTf[pair.Key] + ":");
+				if (d_docHeader.ContainsKey(pair.Key))
+					isHeader = "H";
+				else
+					isHeader = "";
+
+                //tempAns.Append(pair.Key + ";" + d_docTf[pair.Key] + ":");
+				tempAns.Append(pair.Key + ";" + isHeader + "&" + tfCount.Count(x => x == ',') + ":");
                 tempAns.Append(pair.Value);
                 tempAns.Append('|');
                 tfCount += pair.Key + ";";

@@ -14,6 +14,7 @@ namespace SearchEngine.Model
         // <docName,positions> example positions="4,7,8,"
         public Dictionary<string, StringBuilder> d_locations { get; set; }
         public Dictionary<string, int> d_docTf { get; set; }
+        public Dictionary<string, bool> d_docHeader { get; set; }
         public Term(string type, string termString)
         {
             d_locations = new Dictionary<string, StringBuilder>();
@@ -25,7 +26,8 @@ namespace SearchEngine.Model
 		{
 			d_locations = new Dictionary<string, StringBuilder>();
 			d_docTf = new Dictionary<string, int>();
-		}
+            d_docHeader = new Dictionary<string, bool>();
+        }
 
         public override int GetHashCode()
         {

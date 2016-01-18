@@ -164,8 +164,7 @@ namespace SearchEngine
                 File.Delete(postingPath + @"\list4.bin");
                 File.Delete(postingPath + @"\list5.bin");
                 File.Delete(postingPath + @"\Doc.bin");
-                //if (Directory.Exists(postingPath + @"\docs\"))
-                  //  Directory.Delete(postingPath + @"\docs\");
+           
 
 
                 MessageBox.Show("Posting Files were cleared");
@@ -309,6 +308,7 @@ namespace SearchEngine
                 if (!Directory.Exists(txtbx_postingPath.Text))
                 {
                     MessageBox.Show("Please enter a valid Posting Files path");
+                    //hi there
                     return;
                 }
 

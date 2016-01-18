@@ -41,9 +41,6 @@ namespace SearchEngine.Model
 
 			//calculates number of terms in query
 			int termsInQuery = Parse.d_abNumTerms.Count + Parse.d_cfTerms.Count + Parse.d_gmTerms.Count + Parse.d_nrTerms.Count + Parse.d_szTerms.Count;
-			//Dictionary<string, double> docRanks = new Dictionary<string, double>();
-			////this dictionary will be initialized for each document, holds term
-			//Dictionary<string, int> docTerms = new Dictionary<string, int>();
 
 			int maxTf;
 			double wij, idf, tfij, wiq;
@@ -91,7 +88,6 @@ namespace SearchEngine.Model
 
 					sigmaWiqSqr += Math.Pow(wiq, 2);
 				}
-
 
 				//calculate cosine
 				double docsSigmaWijSqr = dDocs[qd.docName].sigmaWijSqr;

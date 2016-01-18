@@ -318,8 +318,8 @@ namespace SearchEngine.Model
 				sigmaWijSqr = CalculateDocsWij(doc.Key, doc.Value.maxtfCount, numOfDocs);
 				Parse.d_docs[doc.Key].sigmaWijSqr = sigmaWijSqr;
 			}
-			IFormatter formatter = new BinaryFormatter();
-			formatter.Serialize(new FileStream(postingPath + @"\newDoc.bin", FileMode.Create, FileAccess.Write, FileShare.None), Parse.d_docs);
+			//IFormatter formatter = new BinaryFormatter();
+			//formatter.Serialize(new FileStream(postingPath + @"\newDoc.bin", FileMode.Create, FileAccess.Write, FileShare.None), Parse.d_docs);
 		}
 
 		/// <summary>
